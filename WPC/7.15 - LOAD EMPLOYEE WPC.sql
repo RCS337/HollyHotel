@@ -1,0 +1,12 @@
+Insert into EMPLOYEE (FIRSTNAME, LASTNAME, DEPARTMENT, PHONE, EMAIL) 	Values ('Mary','Jacobs','Administration','360-285-8110','Mary.Jacobs@WPC.com');
+Insert into EMPLOYEE (FIRSTNAME, LASTNAME, DEPARTMENT, PHONE, EMAIL) 	Values ('Roaslie','Jackson','Administration','360-285-8120','Roaslie.Jackson@WPC.com');
+Insert into EMPLOYEE (FIRSTNAME, LASTNAME, DEPARTMENT, PHONE, EMAIL) 	Values ('Richard','Bandalon','Legal','360-285-8210','Richard.Bandalon@WPC.com');
+Insert into EMPLOYEE (FIRSTNAME, LASTNAME, DEPARTMENT, PHONE, EMAIL) 	Values ('Tom','Caruthers','Accounting','360-285-8310','Tom.Caruthers@WPC.com');
+Insert into EMPLOYEE (FIRSTNAME, LASTNAME, DEPARTMENT, PHONE, EMAIL) 	Values ('Heather','Jones','Accounting','360-285-8320','Heather.Jones@WPC.com');
+Insert into EMPLOYEE (FIRSTNAME, LASTNAME, DEPARTMENT, PHONE, EMAIL) 	Values ('Mary','Abernathy','Finance','360-285-8410','Mary.Abernathy@WPC.com');
+Insert into EMPLOYEE (FIRSTNAME, LASTNAME, DEPARTMENT, PHONE, EMAIL) 	Values ('George','Smith','Human Resources','360-285-8510','George.Smith@WPC.com');
+Insert into EMPLOYEE (FIRSTNAME, LASTNAME, DEPARTMENT, PHONE, EMAIL) 	Values ('Tom','Jackson','Production','360-287-8610','Tom.Jackson@WPC.com');
+Insert into EMPLOYEE (FIRSTNAME, LASTNAME, DEPARTMENT, PHONE, EMAIL) 	Values ('George','Jones','Production','360-287-8620','George.Jones@WPC.com');
+Insert into EMPLOYEE (FIRSTNAME, LASTNAME, DEPARTMENT, PHONE, EMAIL) 	Values ('Ken','Numoto','Marketing','360-287-8710','Ken.Numoto@WPC.com');
+Insert into EMPLOYEE (FIRSTNAME, LASTNAME, DEPARTMENT, PHONE, EMAIL) 	Values ('James','Nestor','InfoSystems','','James.Nestor@WPC.com');
+Insert into EMPLOYEE (FIRSTNAME, LASTNAME, DEPARTMENT, PHONE, EMAIL) 	Values ('Rick','Brown','InfoSystems','360-287-8820','Rick.Brown@WPC.com');
