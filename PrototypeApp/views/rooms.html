@@ -1,1 +1,101 @@
-{{message}}
+<div ng-controller="RoomsController" class="panel panel-default">
+    <!-- Panel Heading -->
+    <div class="panel-heading">All Rooms</div>
+    <!-- Panel Body -->
+    <div class="panel-body">
+        <div class="col-sm-12"><p class="text-right"><strong>Filtered:</strong> {{ filteredItems }} of {{ totalItems}} total rooms</p></div>
+            <!-- Filter Area -->
+            <div class="row">
+                <!-- Filters -->
+                <div class="col-md-12">
+                    <form>
+                        <legend>Filters</legend>
+                        <div class="col-md-2">
+                        <label for="entires">Results</label>
+                            <select name="entries" ng-model="entryLimit" class="form-control">
+                                <option>5</option>
+                                <option>10</option>
+                                <option>20</option>
+                                <option>50</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="beds">Beds</label>
+                            <select name="beds" ng-model="search.bedCount" ng-change="filter()" class="form-control">
+                                <option value="" selected="selected">All</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="bedType">Bed Type</label>
+                            <select name="bedType" ng-model="search.bedType" ng-change="filter()" class="form-control">
+                                <option value="" selected="selected">All</option>
+                                <option value="double">double</option>
+                                <option value="queen">queen</option>
+                                <option value="king">King</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="smoking">Smoking</label>
+                            <select name="smoking" ng-model="search.smoking" ng-change="filter()" class="form-control">
+                                <option value="" selected="selected">All</option>
+                                <option value="non-smoking">Non-Smoking</option>
+                                <option value="smoking">Smoking</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="pool">Pool</label>
+                            <select name="pool" ng-model="search.pool" ng-change="filter()" class="form-control">
+                                <option value="" selected="selected">All</option>
+                                <option value="direct-access">Direct Access</option>
+                                <option value="adjacent">Adjacent</option>
+                                <option value="not-adjacent">Not Adjacent</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <br/>
+            <!-- Data Table-->
+            <div class="dataTable_wrapper table-responsive">
+            <table class="table table-striped table-bordered table-hover table-responsive">
+                <thead>
+                    <tr>
+                        <th ng-click='sort("id")'>Room Number &nbsp;<i class="fa fa-arrows-v"></i></th>
+                        <th ng-click='sort("bedCount")'>Beds &nbsp;<i class="fa fa-arrows-v"></i></th>
+                        <th ng-click='sort("bedType")'>Bed Type &nbsp;<i class="fa fa-arrows-v"></i></th>
+                        <th ng-click='sort("smoking")'>Smoking &nbsp;<i class="fa fa-arrows-v"></i></th>
+                        <th ng-click='sort("wing")'>Wing &nbsp;<i class="fa fa-arrows-v"></i></th>
+                        <th ng-click='sort("pool")'>Pool &nbsp;<i class="fa fa-arrows-v"></i></th>
+                        <th ng-click='sort("parking")'>Parking &nbsp;<i class="fa fa-arrows-v"></i></th>
+                        <th ng-click='sort("handicap")'>Handicap &nbsp;<i class="fa fa-arrows-v"></i></th>
+                        <th ng-click='sort("status")'>Status &nbsp;<i class="fa fa-arrows-v"></i></th>
+                    </tr>
+                </thead>
+                <!-- If guests exists (per filters), show this -->
+                <tbody ng-show="filteredItems > 0">
+                    <tr ng-repeat="data in filtered = (list | filter:search | orderBy : predicate :reverse) | startFrom:(currentPage-1)*entryLimit | limitTo:entryLimit">
+                        <td>{{data.id}}</a></td>
+                        <td>{{data.bedCount}}</a></td>
+                        <td>{{data.bedType}}</a></td>
+                        <td>{{data.smoking}}</td>
+                        <td>{{data.wing}}</td>
+                        <td>{{data.pool}}</td>
+                        <td>{{data.parking}}</td>
+                        <td>{{data.handicap}}</td>
+                        <td>{{data.status}}</td>
+                    </tr>
+                </tbody>
+                <!-- Else ff no guests exists (per filters) show this -->
+                <tbody ng-show="filteredItems == 0">
+                    <tr><td colspan="8">No Rooms Found</td></tr>
+                </tbody>
+            </table>
+            <!-- Pagination -->
+            <div class="col-sm-12">
+            <pagination ng-model="currentPage" max-size="maxSize" total-items="filteredItems" boundary-links="false" rotate="false" items-per-page="entryLimit"></pagination>
+            </div>
+        </div><!-- /.dataTable-wrapper-->
+    </div><!-- /.panel-body -->
+</div><!-- /.panel -->

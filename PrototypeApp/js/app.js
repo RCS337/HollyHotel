@@ -10,12 +10,19 @@ angular.module('ProtoApp', ['ngRoute', 'ui.bootstrap'])
                 templateUrl: 'views/dashboard.html'
             })
             .when('/rooms', {
-                controller: 'RoomsCtrl',
-                templateUrl: 'views/rooms.html'
+                controller: 'MainController',
+                templateUrl: 'views/rooms.html',
+
             })
             .when('/guests', {
-                controller: 'GuestsCtrl',
-                templateUrl: 'views/guests.html'
+                controller: 'MainController',
+                templateUrl: 'views/guests.html',
+                title: 'Guests'
+            })
+            .when('/guests/:guestID', {
+                controller: 'MainController',
+                templateUrl: 'views/guestDetails.html',
+                title: 'Guests Details'
             })
             .otherwise({
                 controller: 'DashboardCtrl',
