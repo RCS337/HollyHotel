@@ -1,4 +1,5 @@
-
+create schema WPC;
+use wpc;
 /*7.4*/
 CREATE TABLE DEPARTMENT (
 DepartmentName		NVARCHAR(35) NOT NULL
