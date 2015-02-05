@@ -1,0 +1,49 @@
+7.19
+INSERT INTO EMPLOYEE
+	(Department, Email, FirstName, LastName)
+	SELECT Department, Email, FirstName, LastName
+	FROM NEW_EMPLOYEE
+);
+	
+7.20
+UPDATE employee 
+	SET   phone_number = '360-287-8810'
+	WHERE EmployeeNumber = 11;
+7.21
+UPDATE employee 
+	SET   department = 'finance'
+	WHERE EmployeeNumber = 5;
+7.22
+UPDATE employee 
+	SET   phone_number = '3602878420'
+	WHERE EmployeeNumber = 5;
+7.23
+UPDATE employee
+	SET   department = 'finance', phone_number = '3602878420'
+	WHERE EmployeeNumber = 5;
+7.24
+UPDATE assignment
+	SET   HoursWorked = 60
+	WHERE EmployeeNumber = 10;
+7.25
+UPDATE employee
+	SET Email = (
+		SELECT NewEmail FROM new_email 
+		WHERE new_email.EmployeeNumber = Email.EmployeeNumber
+		);
+7.26
+DELETE FROM assignment
+	WHERE project = '2011 Q3 Product Plan';
+7.27
+DELETE FROM employee
+	WHERE employeeName = 'Smith';
+7.28
+SELECT *
+	FROM employee
+	JOIN assignment on employee.employeeNumber = assignment.employeeNumber
+	JOIN project on assignment.projectID = project.projectID;
+7.29
+7.30
+7.31
+7.32
+7.33
