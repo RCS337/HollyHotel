@@ -1,0 +1,43 @@
+Views / Queries
+
+Make sleeping reservation
+=========================
+Get existing customer info from first name, last name, or both
+Update existing customer information
+Insert new customers
+Check that rooms of specified type are available for duration of stay
+Insert reservation
+
+Check-in customer
+=================
+Get existing customer info from first name, last name, or both
+Update existing customer information
+Get reservation based on reservation id, or customer firstname lastname
+Get all available rooms
+Get all available rooms that match reservation details
+Assign room to customer
+Assign room key to room
+
+Check-out guest
+===============
+From room number:
+	Get guest info
+	Get payment info
+	Get room info
+	Get all charges associated with guest / room
+Submit payment, mark charges as paid
+flag room for check-out maintenance
+
+Make room adjustments
+=====================
+Get room / guest info
+Get available rooms
+Un-assign guest from room, re-assign guest to new room
+Flag old room for check-out maintenance
+
+Maintenance
+===========
+Get all rooms flagged for maintenance
+Flag a room for maintenance
+Submit maintenance log
+
