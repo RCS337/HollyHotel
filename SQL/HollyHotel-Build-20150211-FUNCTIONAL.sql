@@ -698,6 +698,81 @@ where c.CustomerType = 'C'
 ; $$
 
 
+DROP VIEW IF EXISTS BuildWingFeatVw $$
+
+CREATE VIEW BuildWingFeatVw AS
+SELECT BUILDINGID, WINGID
+, GROUP_CONCAT(f.Name order by f.Name) as Features
+, GROUP_CONCAT(bwf.FeatureID order by bwf.FeatureID) as FeatureIDs
+
+From BUILDING_WING_FEATURES bwf 
+JOIN Type_Name f on f.TypeNameID=bwf.FeatureID
+
+WHERE bwf.ProximityID not in (Select TypeNameID from Type_Name where UsageID='ProximityID' and Name = 'None')
+GROUP by BuildingID, WingId; $$
+
+
+
+DROP VIEW IF EXISTS SleepRoomInfoVw $$
+
+CREATE VIEW SleepRoomInfoVw AS
+
+Select 
+  r.RoomID
+, r.RoomNumber
+, b.Name as BuildingName
+, w.Name as WingName
+, r.Floor as FloorNumber
+, case when wf.SmokingProhibited = 1 then 0 when rd.PermitSmoking = 0 then 0 else 1 end as SmokingAllowed
+, GROUP_CONCAT(concat(rb.BedSequence, '-',bd.Name) order by rb.BedSequence) as Beds
+, GROUP_CONCAT(rb.BedType order by rb.BedSequence) as BedTypes
+, bwf.Features
+, bwf.FeatureIds
+
+from room r
+join Type_Name b on b.TypeNameID = r.BuildingID
+join Type_Name w on w.TypeNameID = r.WingID
+join WING_FLOOR wf on wf.BuildingId = r.BuildingID and wf.WingId=r.WingID and wf.FloorNumber=r.Floor
+join BuildWingFeatVw bwf on bwf.BuildingID=r.BuildingId and bwf.WingId=r.WingId
+
+join ROOM_DETAIL rd on r.RoomID=rd.RoomID and RoomType in (Select TypeNameID from Type_Name where UsageID='RoomType' and Name = 'Sleeping')
+JOIN ROOM_BEDS rb on rb.RoomID=r.RoomID
+JOIN Type_Name bd on bd.TypeNameID=rb.BedType
+
+group by r.RoomID
+; $$
+
+
+
+
+DROP VIEW IF EXISTS RoomsBookedVw $$
+
+CREATE VIEW RoomsBookedVw AS
+select 
+  RoomID
+, CheckIn  AS StartDate
+, AnticipatedCheckOut AS EndDate
+from STAY 
+WHERE CheckOut is null
+
+UNION
+
+SELECT
+RoomID
+, StartDate
+, EndDate
+from RESERVATION
+WHERE RoomID is not null and IFNULL(ConvertedToStay,0) = 0
+
+UNION
+SELECT
+  ROOMID
+, StartDate
+, AnticipatedEndDate
+from MAINTENANCE_TICKET
+WHERE EndDate is NULL
+; $$
+
 
 /***************************************************************************************************************************************************************
 STORED PROCEDURES
@@ -765,6 +840,56 @@ END; $$
 
 
 
+
+DROP PROCEDURE IF EXISTS `InsertStaySp`; $$
+
+CREATE PROCEDURE `InsertStaySp` (
+  pBillToID  INT 
+, pGuestID	INT
+, pReservationID	INT
+, pEventID		Int
+, pRoomID	Int
+, pAnticipatedCheckOut	DateTime
+, pRate DEC(12,2)
+
+)
+BEGIN
+	DECLARE StayID INT;
+    
+	if pBillToID is not null then
+    Begin
+		IF pReservationID is Not NULL and pRoomID is Not Null THEN 
+			BEGIN
+            SELECT 
+				IFNULL(pGuestID,r.GuestID) 
+            ,	IFNULL(pEventID,r.EventID)
+            , 	IFNULL(pAnticipatedCheckOut, r.EndDate)
+            , 	IFNULL(pRate,r.Rate)
+            
+            into pGuestID
+			,	pEventID
+            , 	pAnticipatedCheckOut
+            ,	pRate
+            FROM RESERVATION r where r.ReservationID=pReservationID;
+            
+            UPDATE RESERVATION SET ConvertedToStay = 1 where ReservationID = pReservationID;
+            
+			
+            END;
+		END IF;
+        
+		INSERT INTO STAY (BillToID, GuestID, ReservationID, EventID, RoomID, CheckIn, AnticipatedCheckOut) values (pBillToID, pGuestID, pReservationID, pEventID, pRoomID, NOW(), pAnticipatedCheckOut);
+		SELECT LAST_INSERT_ID() into StayID;
+        
+        INSERT INTO STAY_CHARGES(STAYID, ChargeTo, ChargeType, Amount, ChargeDate, DueDate) values (StayId, pBillToID, (SELECT TypeNameID from Type_Name where UsageID = 'ChargeType' and Name = 'Room Charges'),pRate, NOW(), pAnticipatedCheckOut);
+		
+		
+
+		End;
+    
+    end if;  # billtoid, roomid
+    
+END; $$
 
 
 /***************************************************************************************************************************************************************
