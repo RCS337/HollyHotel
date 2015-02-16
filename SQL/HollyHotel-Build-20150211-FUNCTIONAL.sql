@@ -23,24 +23,27 @@ USE `hollyhotel` ;
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `CUSTOMER` ;
 
-CREATE TABLE IF NOT EXISTS `CUSTOMER` (
+CREATE TABLE IF NOT EXISTS `hollyhotel`.`CUSTOMER` (
   `CustomerID` INT NOT NULL AUTO_INCREMENT COMMENT 'Surrogate Key',
   `CustomerType` VARCHAR(1) NOT NULL DEFAULT 'C' COMMENT '(C)ustomer or (O)rganization\n--Possibly convert this over to Name_Type?',
-  `FirstName` VARCHAR(30) NULL COMMENT 'Required when this is a Customer  Record',
-  `LastName` VARCHAR(30) NULL COMMENT 'Required for a Customer Record',
-  `OrganizationName` VARCHAR(45) NULL COMMENT 'Required when the type is organization',
+  `FirstName` VARCHAR(30) NOT NULL COMMENT 'Required when this is a Customer  Record',
+  `LastName` VARCHAR(30) NOT NULL COMMENT 'Required for a Customer Record',
+  `OrganizationName` VARCHAR(45) NOT NULL COMMENT 'Required when the type is organization',
   `ContactInfoConfidential` TINYINT(1) NULL DEFAULT 0 COMMENT 'Column used to note if the Customers want to keep their information confidential from outside parties',
   `Primary_Organization_Contact` INT NULL COMMENT 'If the \"Customer\" is an organization, then require a contact (points to another Customer Record)',
   PRIMARY KEY (`CustomerID`),
+  INDEX `Organization_PrimaryContactID_idx` (`Primary_Organization_Contact` ASC),
+  UNIQUE INDEX `CUSTOMER_AK1` (`FirstName` ASC, `LastName` ASC, `OrganizationName` ASC),
   CONSTRAINT `Organization_PrimaryContactID_FK`
     FOREIGN KEY (`Primary_Organization_Contact`)
-    REFERENCES `CUSTOMER` (`CustomerID`)
+    REFERENCES `hollyhotel`.`CUSTOMER` (`CustomerID`)
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
 COMMENT = 'Table contains the primary information for a customer or org' /* comment truncated */ /*anization*/;
 
-CREATE INDEX `Organization_PrimaryContactID_idx` ON `CUSTOMER` (`Primary_Organization_Contact` ASC);
+#customerCREATE INDEX `Organization_PrimaryContactID_idx` ON `CUSTOMER` (`Primary_Organization_Contact` ASC);
+
 
 
 -- -----------------------------------------------------
@@ -51,7 +54,7 @@ DROP TABLE IF EXISTS `PHONE` ;
 CREATE TABLE IF NOT EXISTS `PHONE` (
   `CustomerID` INT NOT NULL COMMENT 'Foreign key, pointing to the master customer record',
   `PhoneNumSeq` INT NOT NULL DEFAULT 0 COMMENT '0 = Main, 1 = Office, 2 = Cell? -- (Possibly move this over to the Type_Name table)',
-  `PhoneNum` INT NULL COMMENT 'Actual Phone number, removing the dashes.  number must be between 1001000000-9999999999',
+  `PhoneNum` VARCHAR(10) NULL COMMENT 'Actual Phone number, removing the dashes.  number must be between 1001000000-9999999999',
   PRIMARY KEY (`CustomerID`, `PhoneNumSeq`),
   CONSTRAINT `PHONE_CUSTOMERID_FK`
     FOREIGN KEY (`CustomerID`)
@@ -125,7 +128,7 @@ DROP TABLE IF EXISTS `TYPE_NAME` ;
 
 CREATE TABLE IF NOT EXISTS `TYPE_NAME` (
   `TypeNameID` INT NOT NULL AUTO_INCREMENT COMMENT 'Auto assigned surrogate key',
-  `UsageID` VARCHAR(10) NOT NULL COMMENT 'Used to filter the categories by their usage.  i.e. BuildingID, WingID, BedType',
+  `UsageID` VARCHAR(20) NOT NULL COMMENT 'Used to filter the categories by their usage.  i.e. BuildingID, WingID, BedType',
   `Name` VARCHAR(45) NOT NULL COMMENT 'Descriptive field of the different types (King Bed, Queen, etc.)',
   `UsageRank` INT NULL DEFAULT 0 COMMENT 'Used for sorting, or ranking for subsitution (King bed is better than a Queen Bed)',
   PRIMARY KEY (`TypeNameID`, `UsageID`))
@@ -305,19 +308,21 @@ CREATE TABLE IF NOT EXISTS `ROOM_DETAIL` (
   `PermitSmoking` TINYINT(1) NULL DEFAULT 0 COMMENT 'Used if a specific room permits smoking; this will be used in conjunction with the floor setting. This is only required for sleeping rooms',
   `ExtraSpace` INT NULL COMMENT 'Sleeping Room Specific setting,',
   `Rate` DECIMAL(12,2) NOT NULL DEFAULT 0 COMMENT 'Suites/Sleeping this is the daily rate\nMeeting Rooms this is the Hourly Rate',
-  PRIMARY KEY (`RoomID`),
+  PRIMARY KEY (`RoomID`, `RoomType`),
+  INDEX `ROOM_DETAIL_RoomType_FK_idx` (`RoomType` ASC),
   CONSTRAINT `ROOM_DETAIL_RoomID_FK`
     FOREIGN KEY (`RoomID`)
-    REFERENCES `ROOM` (`RoomID`)
+    REFERENCES `hollyhotel`.`ROOM` (`RoomID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `ROOM_DETAIL_RoomType_FK`
     FOREIGN KEY (`RoomType`)
-    REFERENCES `TYPE_NAME` (`TypeNameID`)
+    REFERENCES `hollyhotel`.`TYPE_NAME` (`TypeNameID`)
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
 COMMENT = 'Contains the specific information based on the type of prope' /* comment truncated */ /*rties that a room will have depending on the room type.  Room Requires at least one assignment (business logic)*/;
+
 
 CREATE INDEX `ROOM_DETAIL_RoomType_FK_idx` ON `ROOM_DETAIL` (`RoomType` ASC);
 
@@ -655,8 +660,117 @@ CREATE INDEX `fk_BUILDWING_FEATURES_TYPE_NAME1_idx1` ON `BUILDING_WING_FEATURES`
 
 USE `hollyhotel`;
 
+
+
+/***************************************************************************************************************************************************************/
 delimiter $$
 
+/***************************************************************************************************************************************************************
+VIEWS
+
+****************************************************************************************************************************************************************/
+DROP VIEW IF EXISTS StdCustomerInfoVw $$
+
+CREATE VIEW StdCustomerInfoVw AS
+select
+c.CustomerID
+, c.FirstName
+, c.LastName
+, c.contactInfoConfidential
+
+, a0.Address1 as BillToAddress1
+, a0.Address2 as BillToAddress2
+, a0.Address3 as BillToAddress3
+, a0.Address4 as BillToAddress4
+, a0.City as BillToCity
+, a0.State as BillToState
+, a0.Zip as BillToZip
+, a0.Country as BillToCountry
+
+, p0.PhoneNum as BillToPhoneNum
+
+from Customer c
+join address a0 on a0.CustomerID=c.CustomerID and a0.AddressSeq = 0
+join phone p0 on p0.CustomerID=c.CustomerID and p0.PhoneNumSeq = 0
+
+where c.CustomerType = 'C'
+
+; $$
+
+
+
+/***************************************************************************************************************************************************************
+STORED PROCEDURES
+
+****************************************************************************************************************************************************************/
+DROP PROCEDURE IF EXISTS `InsUpStdCustomerSp`; $$
+
+CREATE PROCEDURE `InsUpStdCustomerSp` (
+  CustomerID  INT
+, FirstName varchar(30)
+, LastName varchar(30) 
+, ContactInfoconfidential tinyint
+
+, BillToAddress1 VARCHAR(45)
+, BillToAddress2 VARCHAR(45)
+, BillToAddress3 VARCHAR(45)
+, BillToAddress4 VARCHAR(45)
+, BillToCity VARCHAR(45)
+, BillToState VARCHAR(3)
+, BillToZip   VARCHAR(10)
+, BillToCountry VARCHAR(45)
+
+, BillToPhoneNum VARCHAR(10)
+
+)
+BEGIN
+	if FirstName is not null and LastName is not null then 
+    Begin
+		SET ContactInfoConfidential =IFNULL(ContactInfoConfidential,0);
+        IF CustomerID is NULL THEN 
+			BEGIN
+            INSERT INTO CUSTOMER (FirstName, LastName, OrganizationName, ContactInfoConfidential) Values(FirstName, LastName, '', ContactInfoConfidential);
+			SELECT LAST_INSERT_ID() into CustomerID;
+            END;
+		ELSE
+			BEGIN
+            UPDATE CUSTOMER as c SET 
+						c.FirstName = Firstname
+					   , c.LastName = LastName
+                       , c.ContactInfoConfidential = ContactInfoConfidential
+				where c.CustomerID = CustomerID;
+			END;
+        END IF; #CUSTOMERID IS NULL
+		
+		INSERT INTO Address (CustomerID, AddressSeq, Address1, Address2, Address3, Address4, City, State, Zip, Country) VALUES( CustomerID, 0, BillToAddress1, BillToAddress2, BillToAddress3, BillToAddress4, BillToCity, BillToState, BillToZip, BillToCountry)
+			ON DUPLICATE KEY UPDATE
+				Address1 = BillToAddress1,
+                Address2 = BillToAddress2,
+                Address3 = BillToAddress3,
+                Address4 = BillToAddress4,
+                City = BillToCity,
+                State = BillToState,
+                Zip = BillToZip,
+                Country = BillToCountry
+                ;
+		
+        INSERT INTO Phone(CustomerID, PhoneNumSeq, PhoneNum) VALUES(CustomerID,0,BillToPhoneNum) 
+			ON DUPLICATE KEY UPDATE
+            PhoneNum = BillToPhoneNum;
+		End;
+    
+    end if;  # firstname/lastname
+    
+END; $$
+
+
+
+
+
+/***************************************************************************************************************************************************************
+TRIGGERS
+
+****************************************************************************************************************************************************************/
 USE `hollyhotel`$$
 DROP TRIGGER IF EXISTS `BUILDING_WING_BEFORE_INSERT` $$
 USE `hollyhotel`$$
@@ -756,7 +870,7 @@ CREATE TRIGGER `ROOM_BEDS_BEFORE_INSERT` BEFORE INSERT ON `ROOM_BEDS`
 	END; 
     
  END IF;
- END; #TRIGGER
+ END; 
     $$
 
 
@@ -960,7 +1074,7 @@ CREATE TRIGGER `BUILDWING_FEATURES_BEFORE_INSERT` BEFORE INSERT ON `BUILDING_WIN
 		SIGNAL sqlstate '45000' SET message_text = msg;
     END; #elseif
  END IF;
- END; #TRIGGER
+ END; 
 
     $$
 
@@ -991,36 +1105,5 @@ CREATE TRIGGER `BUILDWING_FEATURES_BEFORE_UPDATE` BEFORE UPDATE ON `BUILDING_WIN
 
 DELIMITER ;
 
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
--- -----------------------------------------------------
--- Data for table `TYPE_NAME`
--- -----------------------------------------------------
-START TRANSACTION;
-USE `hollyhotel`;
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BuildingID', 'Main Building', NULL);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BuildingID', 'Heritage Building', NULL);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BuildingID', 'Savanah Building', NULL);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'WingID', 'North Wing', NULL);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'WingID', 'East Wing', NULL);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'WingID', 'South Wing', NULL);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'WingID', 'East Wing', NULL);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'Single Bed', 1);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'Double Bed', 2);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'Queen Bed', 3);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'King Bed', 4);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'Fold Out Couch', 0);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'Roll-Away Bed', 0);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'Hide-Away Bed (Wall)', 0);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'RoomType', 'Sleeping', NULL);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'RoomType', 'Meeting', NULL);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'RoomType', 'Suite', NULL);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'MealID', 'Breakfast', 1);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'MealID', 'Lunch', 2);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'MealID', 'Dinner', 3);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'MealID', 'Bar', 4);
-
-COMMIT;
 
