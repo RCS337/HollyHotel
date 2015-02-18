@@ -1,0 +1,51 @@
+<h1>Check-In</h1>
+<div ng-controller="ReservationController" class="panel panel-default">
+    <!-- Panel Heading -->
+    <div class="panel-heading">Todays Reservations</div>
+    <!-- Panel Body -->
+    <div class="panel-body">
+            <!-- Filter Area -->
+            <div class="row">
+                <!-- Result Select -->
+                <!-- Filters -->
+                <div class="col-md-10">
+                    <form>
+                        <legend>Filter By Name</legend>
+                        <div class="col-md-6">
+                            <input type="text" name="firstName" ng-model="search.firstname" ng-change="filter()" placeholder="First Name" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" name="lastName" ng-model="search.lastname" ng-change="filter()" placeholder="Last Name" class="form-control" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <br/>
+            <!-- Data Table-->
+            <div class="dataTable_wrapper table-responsive">
+            <table class="table table-striped table-bordered table-hover table-responsive">
+                <thead>
+                    <tr>
+                        <th ng-click='sort("FirstName")'>First Name &nbsp;<i class="fa fa-arrows-v"></i></th>
+                        <th ng-click='sort("LastName")'>Last Name &nbsp;<i class="fa fa-arrows-v"></i></th>
+                    </tr>
+                </thead>
+                <!-- If guests exists (per filters), show this -->
+                <tbody ng-show="filteredItems > 0">
+                    <tr ng-repeat="data in filtered = (list | filter:search | orderBy : predicate :reverse) | startFrom:(currentPage-1)*entryLimit | limitTo:entryLimit">
+                        <td ng-click="go('/guests/' + data.ReservationID)">{{data.FirstName}}</a></td>
+                        <td>{{data.LastName}}</a></td>
+                    </tr>
+                </tbody>
+                <!-- Else ff no guests exists (per filters) show this -->
+                <tbody ng-show="filteredItems == 0">
+                    <tr><td colspan="8">No Items Found</td></tr>
+                </tbody>
+            </table>
+            <!-- Pagination -->
+            <div class="col-sm-12">
+            <pagination ng-model="currentPage" max-size="maxSize" total-items="filteredItems" items-per-page="entryLimit" boundary-links="false" rotate="false"></pagination>
+            </div>
+        </div><!-- /.dataTable-wrapper-->
+    </div><!-- /.panel-body -->
+</div><!-- /.panel -->

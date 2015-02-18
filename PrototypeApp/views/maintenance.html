@@ -1,6 +1,7 @@
-<div ng-controller="GuestsController" class="panel panel-default">
+<h1>Maint</h1>
+<div ng-controller="MaintController" class="panel panel-default">
     <!-- Panel Heading -->
-    <div class="panel-heading">View Guests NOW</div>
+    <div class="panel-heading">Maintenance</div>
     <!-- Panel Body -->
     <div class="panel-body">
         <div class="col-sm-12"><p class="text-right">Filtered {{ filteredItems }} of {{ totalItems}} total customers</p></div>
@@ -9,7 +10,7 @@
                 <!-- Result Select -->
                 <div class="col-md-2">
                     <form>
-                        <legend>Guests</legend>
+                        <legend>Items</legend>
                         <select name="entries" ng-model="entryLimit" class="form-control">
                             <option>5</option>
                             <option>10</option>
@@ -37,34 +38,26 @@
             <table class="table table-striped table-bordered table-hover table-responsive">
                 <thead>
                     <tr>
-                        <th ng-click='sort("firstname")'>First Name &nbsp;<i class="fa fa-arrows-v"></i></th>
-                        <th ng-click='sort("middleinit")'>MI &nbsp;<i class="fa fa-arrows-v"></i></th>
-                        <th ng-click='sort("lastname")'>Last Name &nbsp;<i class="fa fa-arrows-v"></i></th>
-                        <th ng-click='sort("streetaddress")'>Street &nbsp;<i class="fa fa-arrows-v"></i></th>
-                        <th ng-click='sort("city")'>City &nbsp;<i class="fa fa-arrows-v"></i></th>
-                        <th ng-click='sort("state")'>State &nbsp;<i class="fa fa-arrows-v"></i></th>
-                        <th ng-click='sort("zip")'>ZIP &nbsp;<i class="fa fa-arrows-v"></i></th>
-                        <th ng-click='sort("phone")'>Phone &nbsp;<i class="fa fa-arrows-v"></i></th>
-                        <th ng-click='sort("dob")'>DOB &nbsp;<i class="fa fa-arrows-v"></i></th>
+                        <th ng-click='sort("MaintTicketID")'>Ticket ID &nbsp;<i class="fa fa-arrows-v"></i></th>
+                        <th ng-click='sort("RoomID")'>Room ID &nbsp;<i class="fa fa-arrows-v"></i></th>
+                        <th ng-click='sort("StartDate")'>Start Date &nbsp;<i class="fa fa-arrows-v"></i></th>
+                        <th ng-click='sort("AnticipatedEndDate")'>Due By &nbsp;<i class="fa fa-arrows-v"></i></th>
+                        <th ng-click='sort("MaintenanceType")'>Type &nbsp;<i class="fa fa-arrows-v"></i></th>
                     </tr>
                 </thead>
                 <!-- If guests exists (per filters), show this -->
                 <tbody ng-show="filteredItems > 0">
                     <tr ng-repeat="data in filtered = (list | filter:search | orderBy : predicate :reverse) | startFrom:(currentPage-1)*entryLimit | limitTo:entryLimit">
-                        <td ng-click="go('/guests/' + data.firstname)">{{data.firstname}}</a></td>
-                        <td>{{data.middleinit}}</a></td>
-                        <td>{{data.lastname}}</a></td>
-                        <td>{{data.streetaddress}}</td>
-                        <td>{{data.city}}</td>
-                        <td>{{data.state}}</td>
-                        <td>{{data.zip}}</td>
-                        <td>{{data.phone}}</td>
-                        <td>{{data.dob}}</td>
+                        <td ng-click="go('/guests/' + data.MaintTicketID)">{{data.MaintTicketID}}</a></td>
+                        <td>{{data.RoomID}}</a></td>
+                        <td>{{data.StartDate}}</a></td>
+                        <td>{{data.AnticipatedEndDate}}</td>
+                        <td>{{data.MaintenanceType}}</td>
                     </tr>
                 </tbody>
                 <!-- Else ff no guests exists (per filters) show this -->
                 <tbody ng-show="filteredItems == 0">
-                    <tr><td colspan="8">No Guest Found</td></tr>
+                    <tr><td colspan="8">No Items Found</td></tr>
                 </tbody>
             </table>
             <!-- Pagination -->

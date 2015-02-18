@@ -1,21 +1,3 @@
-<!doctype html>
-<html ng-app="ProtoApp" lang="en">
-<head>
-    <!-- Required base tag for angular routing -->
-    <base href="/"></base>
-    <meta charset="utf-8">
-    <title>{{ title }}</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <!-- Place favicon.ico in the root directory -->
-    <!-- Bootstrap Core CSS -->
-    <link href="../css/bootstrap.css" rel="stylesheet">
-    <link href="../css/font-awesome/css/font-awesome.css" rel="stylesheet">
-    <link href="../css/protoapp.css" rel="stylesheet">
-</head>
-<body>
-
 <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
     <div class="navbar-header">
         <!-- ############# Collapsable navigation menu #############-->
@@ -228,7 +210,7 @@
                 <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
                 </li>
                 <li class="divider"></li>
-                <li><a href="login.html"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                <li><a href="logout.php" target="_self"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
                 </li>
             </ul>
             <!-- /.dropdown-user -->
@@ -288,19 +270,3 @@
             </ul>
         </div><!-- /.sidebar-collapse -->
 </nav>
-
-<div id="page-wrapper" class="container-fluid" ng-view></div>
-
-<!-- All of our JavaScript files -->
-<script src="../js/angular-core/angular.js"></script>
-<script src="../js/angular-route/angular-route.js"></script>
-<script src="../js/bootstrap/ui-bootstrap-tpls-0.12.0.js"></script>
-<script src="../js/jquery/jquery.js"></script>
-<script src="../js/protoapp.js"></script>
-<script src="../js/app.js"></script>
-<script src="../js/filters.js"></script>
-<script src="../js/factories.js"></script>
-<script src="../js/controllers.js"></script>
-<script src="../js/bootstrap/bootstrap.js"></script>
-</body>
-</html>

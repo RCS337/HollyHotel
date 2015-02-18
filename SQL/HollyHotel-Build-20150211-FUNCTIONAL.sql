@@ -670,7 +670,7 @@ CREATE TABLE IF NOT EXISTS `USERS` (
   `username` VARCHAR(50) NOT NULL COMMENT 'Login ID',
   `password` VARCHAR(32) NOT NULL COMMENT 'Encrypted',
   `email` VARCHAR(255) NULL COMMENT 'Allow to store email address',
-  `create_time` DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Time Stamp',
+  `create_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Time Stamp',
   PRIMARY KEY (`userID`))
 COMMENT = 'Simple table to implement basic authentication';
 
@@ -718,7 +718,7 @@ SELECT BUILDINGID, WINGID
 , GROUP_CONCAT(f.Name order by f.Name) as Features
 , GROUP_CONCAT(bwf.FeatureID order by bwf.FeatureID) as FeatureIDs
 
-From BUILDING_WING_FEATURES bwf 
+From BUILDING_WING_FEATURES bwf
 JOIN Type_Name f on f.TypeNameID=bwf.FeatureID
 
 WHERE bwf.ProximityID not in (Select TypeNameID from Type_Name where UsageID='ProximityID' and Name = 'None')
@@ -730,7 +730,7 @@ DROP VIEW IF EXISTS SleepRoomInfoVw $$
 
 CREATE VIEW SleepRoomInfoVw AS
 
-Select 
+Select
   r.RoomID
 , r.RoomNumber
 , b.Name as BuildingName
@@ -761,11 +761,11 @@ group by r.RoomID
 DROP VIEW IF EXISTS RoomsBookedVw $$
 
 CREATE VIEW RoomsBookedVw AS
-select 
+select
   RoomID
 , CheckIn  AS StartDate
 , AnticipatedCheckOut AS EndDate
-from STAY 
+from STAY
 WHERE CheckOut is null
 
 UNION
@@ -800,7 +800,7 @@ DROP PROCEDURE IF EXISTS `InsUpStdCustomerSp`; $$
 CREATE PROCEDURE `InsUpStdCustomerSp` (
   CustomerID  INT
 , FirstName varchar(30)
-, LastName varchar(30) 
+, LastName varchar(30)
 , ContactInfoconfidential tinyint
 
 , BillToAddress1 VARCHAR(45)
@@ -816,24 +816,24 @@ CREATE PROCEDURE `InsUpStdCustomerSp` (
 
 )
 BEGIN
-	if FirstName is not null and LastName is not null then 
+	if FirstName is not null and LastName is not null then
     Begin
 		SET ContactInfoConfidential =IFNULL(ContactInfoConfidential,0);
-        IF CustomerID is NULL THEN 
+        IF CustomerID is NULL THEN
 			BEGIN
             INSERT INTO CUSTOMER (FirstName, LastName, OrganizationName, ContactInfoConfidential) Values(FirstName, LastName, '', ContactInfoConfidential);
 			SELECT LAST_INSERT_ID() into CustomerID;
             END;
 		ELSE
 			BEGIN
-            UPDATE CUSTOMER as c SET 
+            UPDATE CUSTOMER as c SET
 						c.FirstName = Firstname
 					   , c.LastName = LastName
                        , c.ContactInfoConfidential = ContactInfoConfidential
 				where c.CustomerID = CustomerID;
 			END;
         END IF; #CUSTOMERID IS NULL
-		
+
 		INSERT INTO Address (CustomerID, AddressSeq, Address1, Address2, Address3, Address4, City, State, Zip, Country) VALUES( CustomerID, 0, BillToAddress1, BillToAddress2, BillToAddress3, BillToAddress4, BillToCity, BillToState, BillToZip, BillToCountry)
 			ON DUPLICATE KEY UPDATE
 				Address1 = BillToAddress1,
@@ -845,14 +845,14 @@ BEGIN
                 Zip = BillToZip,
                 Country = BillToCountry
                 ;
-		
-        INSERT INTO Phone(CustomerID, PhoneNumSeq, PhoneNum) VALUES(CustomerID,0,BillToPhoneNum) 
+
+        INSERT INTO Phone(CustomerID, PhoneNumSeq, PhoneNum) VALUES(CustomerID,0,BillToPhoneNum)
 			ON DUPLICATE KEY UPDATE
             PhoneNum = BillToPhoneNum;
 		End;
-    
+
     end if;  # firstname/lastname
-    
+
 END; $$
 
 /*************************************************************************************************************************************************************/
@@ -882,7 +882,7 @@ BEGIN
 	DECLARE NextDel INT Default 1;
     DECLARE i		INT DEFAULT 0;
 	DECLARE str CHAR(5);
-    
+
     DROP TABLE IF EXISTS tmp_RES_FEATURES;
 	CREATE TEMPORARY TABLE  tmp_RES_FEATURES (
 	ReservationID		Int
@@ -891,9 +891,9 @@ BEGIN
 	, ProximityID		Int);
 	parse_loop: LOOP
 		Set NextDel = Locate('|',pFEATURES,PrevDel);
-		if NextDel = 0 then 
+		if NextDel = 0 then
 			SET NextDel = LENGTH(pFeatures)+1;
-		elseif NextDel =1 then 
+		elseif NextDel =1 then
 			begin
 			Set PrevDel = 2;
 			Set NextDel = Locate('|',pFEATURES,PrevDel);
@@ -910,17 +910,17 @@ BEGIN
 	end LOOP parse_loop;
 
 	IF pBillToId is not null then  #only really required input
-  
-		#LOOKUP VALUES FROM PARENT 
+
+		#LOOKUP VALUES FROM PARENT
 		IF pParentResID is not Null then
-		SELECT IFNULL(pEventID,EventID), IFNULL(pRoomType,RoomType), IFNULL(pStartDate,StartDate), IFNULL(pEndDate,EndDate), IFNULL(pRate, Rate), IFNULL(pFEATURES,FEATURES) 
+		SELECT IFNULL(pEventID,EventID), IFNULL(pRoomType,RoomType), IFNULL(pStartDate,StartDate), IFNULL(pEndDate,EndDate), IFNULL(pRate, Rate), IFNULL(pFEATURES,FEATURES)
 		INTO pEventID, pRoomType, pStartDate, pEndDate, pRate, pFeatures
 		FROM ReservationSummaryVw ;
 		END IF;
-		
+
         IF pReservationID is Null then
 			BEGIN
-			INSERT INTO RESERVATION (ParentResID, BillToID, GuestID, EventID, RoomType, StartDate, EndDate, Rate, Deposit, RoomID, Smoking) 
+			INSERT INTO RESERVATION (ParentResID, BillToID, GuestID, EventID, RoomType, StartDate, EndDate, Rate, Deposit, RoomID, Smoking)
 				VALUES (pParentResID, pBillToID, pGuestID, pEventID, pRoomType, pStartDate, pEndDate, pRate, pDeposit, pRoomID, pSmoking);
 			SELECT LAST_INSERT_ID() into pReservationID;
 			END;
@@ -941,8 +941,8 @@ BEGIN
 				WHERE ReservationID=pReservationID;
             END;
         END IF; #pReservationID is Null
-		
-        
+
+
         #now set the room features.  better way of doing this, but this is the easiest to code
         DELETE FROM RES_FEATURES WHERE ReservationID = pReservationID;
         INSERT INTO RES_FEATURES (SELECT pReservationID, FeatureSequence, Bed_featureID, ProximityID from tmp_RES_FEATURES);
@@ -957,7 +957,7 @@ End;$$
 DROP PROCEDURE IF EXISTS `InsertStaySp`; $$
 
 CREATE PROCEDURE `InsertStaySp` (
-  pBillToID  INT 
+  pBillToID  INT
 , pGuestID	INT
 , pReservationID	INT
 , pEventID		Int
@@ -968,40 +968,40 @@ CREATE PROCEDURE `InsertStaySp` (
 )
 BEGIN
 	DECLARE StayID INT;
-    
+
 	if pBillToID is not null then
     Begin
-		IF pReservationID is Not NULL and pRoomID is Not Null THEN 
+		IF pReservationID is Not NULL and pRoomID is Not Null THEN
 			BEGIN
-            SELECT 
-				IFNULL(pGuestID,r.GuestID) 
+            SELECT
+				IFNULL(pGuestID,r.GuestID)
             ,	IFNULL(pEventID,r.EventID)
             , 	IFNULL(pAnticipatedCheckOut, r.EndDate)
             , 	IFNULL(pRate,r.Rate)
-            
+
             into pGuestID
 			,	pEventID
             , 	pAnticipatedCheckOut
             ,	pRate
             FROM RESERVATION r where r.ReservationID=pReservationID;
-            
+
             UPDATE RESERVATION SET ConvertedToStay = 1 where ReservationID = pReservationID;
-            
-			
+
+
             END;
 		END IF;
-        
+
 		INSERT INTO STAY (BillToID, GuestID, ReservationID, EventID, RoomID, CheckIn, AnticipatedCheckOut) values (pBillToID, pGuestID, pReservationID, pEventID, pRoomID, NOW(), pAnticipatedCheckOut);
 		SELECT LAST_INSERT_ID() into StayID;
-        
+
         INSERT INTO STAY_CHARGES(STAYID, ChargeTo, ChargeType, Amount, ChargeDate, DueDate) values (StayId, pBillToID, (SELECT TypeNameID from Type_Name where UsageID = 'ChargeType' and Name = 'Room Charges'),pRate, NOW(), pAnticipatedCheckOut);
-		
-		
+
+
 
 		End;
-    
+
     end if;  # billtoid, roomid
-    
+
 END; $$
 
 
@@ -1012,17 +1012,17 @@ TRIGGERS
 USE `hollyhotel`$$
 DROP TRIGGER IF EXISTS `BUILDING_WING_BEFORE_INSERT` $$
 USE `hollyhotel`$$
-CREATE TRIGGER `BUILDING_WING_BEFORE_INSERT` BEFORE INSERT ON `BUILDING_WING` 
+CREATE TRIGGER `BUILDING_WING_BEFORE_INSERT` BEFORE INSERT ON `BUILDING_WING`
   FOR EACH ROW
   BEGIN
 	DECLARE msg varchar(255);
-    
+
     IF NEW.BuildingID not in (select TypeNameID from TYPE_NAME where UsageID = 'BuildingID') then
 		BEGIN
 			SELECT IFNULL(`Name`,'') into msg from Type_Name where TypeNameID=NEW.BuildingID;
 			SET msg = concat(msg, ' is not a valid Building');
 			SIGNAL sqlstate '45000' SET message_text = msg;
-		END; 
+		END;
     ELSEIF NEW.WingID not in (select TypeNameID from TYPE_NAME where UsageID = 'WingID') then
 		BEGIN
 			SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.WingID;
@@ -1030,23 +1030,23 @@ CREATE TRIGGER `BUILDING_WING_BEFORE_INSERT` BEFORE INSERT ON `BUILDING_WING`
 			SIGNAL sqlstate '45000' SET message_text = msg;
 		END;
 	END IF;
- END; 
+ END;
 $$
 
 USE `hollyhotel`$$
 DROP TRIGGER IF EXISTS `BUILDING_WING_BEFORE_UPDATE` $$
 USE `hollyhotel`$$
-CREATE TRIGGER `BUILDING_WING_BEFORE_UPDATE` BEFORE UPDATE ON `BUILDING_WING` 
+CREATE TRIGGER `BUILDING_WING_BEFORE_UPDATE` BEFORE UPDATE ON `BUILDING_WING`
   FOR EACH ROW
   BEGIN
 	DECLARE msg varchar(255);
-    
+
     IF NEW.BuildingID not in (select TypeNameID from TYPE_NAME where UsageID = 'BuildingID') then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.BuildingID;
 		SET msg = concat(msg, ' is not a valid Building');
 		SIGNAL sqlstate '45000' SET message_text = msg;
-	END; 
+	END;
     ELSEIF NEW.WingID not in (select TypeNameID from TYPE_NAME where UsageID = 'WingID') then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.WingID;
@@ -1054,7 +1054,7 @@ CREATE TRIGGER `BUILDING_WING_BEFORE_UPDATE` BEFORE UPDATE ON `BUILDING_WING`
 		SIGNAL sqlstate '45000' SET message_text = msg;
     END;
  END IF;
- END; 
+ END;
 $$
 
 USE `hollyhotel`$$
@@ -1063,15 +1063,15 @@ USE `hollyhotel`$$
 CREATE TRIGGER `hollyhotel`.`RESERVATION_BEFORE_INSERT` BEFORE INSERT ON `RESERVATION` FOR EACH ROW
   BEGIN
 	DECLARE msg varchar(255);
-    
+
     IF NEW.RoomType not in (select TypeNameID from TYPE_NAME where UsageID = 'RoomType') then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.RoomType;
 		SET msg = concat(msg, ' is not a valid Room Type');
 		SIGNAL sqlstate '45000' SET message_text = msg;
-	END; 
+	END;
     END IF;
- END; 
+ END;
  $$
 
 
@@ -1081,13 +1081,13 @@ USE `hollyhotel`$$
 CREATE TRIGGER `hollyhotel`.`RESERVATION_BEFORE_UPDATE` BEFORE UPDATE ON `RESERVATION` FOR EACH ROW
   BEGIN
 	DECLARE msg varchar(255);
-    
+
     IF NEW.RoomType not in (select TypeNameID from TYPE_NAME where UsageID = 'RoomType') then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.RoomType;
 		SET msg = concat(msg, ' is not a valid Room Type');
 		SIGNAL sqlstate '45000' SET message_text = msg;
-	END; 
+	END;
     END IF;
  END; $$
 
@@ -1095,38 +1095,38 @@ CREATE TRIGGER `hollyhotel`.`RESERVATION_BEFORE_UPDATE` BEFORE UPDATE ON `RESERV
 USE `hollyhotel`$$
 DROP TRIGGER IF EXISTS `ROOM_BEDS_BEFORE_INSERT` $$
 USE `hollyhotel`$$
-CREATE TRIGGER `ROOM_BEDS_BEFORE_INSERT` BEFORE INSERT ON `ROOM_BEDS` 
+CREATE TRIGGER `ROOM_BEDS_BEFORE_INSERT` BEFORE INSERT ON `ROOM_BEDS`
   FOR EACH ROW
   BEGIN
 	DECLARE msg varchar(255);
-    
+
     IF NEW.BedType not in (select TypeNameID from TYPE_NAME where UsageID = 'BedType') then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.BedType;
 		SET msg = concat(msg, ' is not a valid Bed Type');
 		SIGNAL sqlstate '45000' SET message_text = msg;
-	END; 
-    
+	END;
+
  END IF;
- END; 
+ END;
     $$
 
 
 USE `hollyhotel`$$
 DROP TRIGGER IF EXISTS `ROOM_BEDS_BEFORE_UPDATE` $$
 USE `hollyhotel`$$
-CREATE TRIGGER `ROOM_BEDS_BEFORE_UPDATE` BEFORE UPDATE ON `ROOM_BEDS` 
+CREATE TRIGGER `ROOM_BEDS_BEFORE_UPDATE` BEFORE UPDATE ON `ROOM_BEDS`
   FOR EACH ROW
   BEGIN
 	DECLARE msg varchar(255);
-    
+
     IF NEW.BedType not in (select TypeNameID from TYPE_NAME where UsageID = 'BedType') then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.BedType;
 		SET msg = concat(msg, ' is not a valid Bed Type');
 		SIGNAL sqlstate '45000' SET message_text = msg;
-	END; 
-    
+	END;
+
  END IF;
  END; $$
 
@@ -1137,13 +1137,13 @@ USE `hollyhotel`$$
 CREATE TRIGGER `hollyhotel`.`ROOM_DETAIL_BEFORE_INSERT` BEFORE INSERT ON `ROOM_DETAIL` FOR EACH ROW
   BEGIN
 	DECLARE msg varchar(255);
-    
+
     IF NEW.RoomType not in (select TypeNameID from TYPE_NAME where UsageID = 'RoomType') then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.RoomType;
 		SET msg = concat(msg, ' is not a valid Room Type');
 		SIGNAL sqlstate '45000' SET message_text = msg;
-	END; 
+	END;
     END IF;
  END; $$
 
@@ -1154,15 +1154,15 @@ USE `hollyhotel`$$
 CREATE TRIGGER `hollyhotel`.`ROOM_DETAIL_BEFORE_UPDATE` BEFORE UPDATE ON `ROOM_DETAIL` FOR EACH ROW
   BEGIN
 	DECLARE msg varchar(255);
-    
+
     IF NEW.RoomType not in (select TypeNameID from TYPE_NAME where UsageID = 'RoomType') then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.RoomType;
 		SET msg = concat(msg, ' is not a valid Room Type');
 		SIGNAL sqlstate '45000' SET message_text = msg;
-	END; 
+	END;
     END IF;
- END; 
+ END;
  $$
 
 
@@ -1172,13 +1172,13 @@ USE `hollyhotel`$$
 CREATE TRIGGER `hollyhotel`.`RES_FEATURES_BEFORE_INSERT` BEFORE INSERT ON `RES_FEATURES` FOR EACH ROW
   BEGIN
 	DECLARE msg varchar(255);
-    
+
     IF NEW.BedFeatureID not in (select TypeNameID from TYPE_NAME where UsageID = 'BedType' or UsageID = 'FeatureID') then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.BedFeatureID;
 		SET msg = concat(msg, ' is not a valid Bed/Feature Type');
 		SIGNAL sqlstate '45000' SET message_text = msg;
-	END; 
+	END;
    ELSEIF NEW.ProximityID not in (select TypeNameID from TYPE_NAME where UsageID = 'ProximityID' UNION SELECT NULL AS TypeNameID UNION SELECT 0 AS TypeNameID ) then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.ProximityID;
@@ -1196,13 +1196,13 @@ USE `hollyhotel`$$
 CREATE TRIGGER `hollyhotel`.`RES_FEATURES_BEFORE_UPDATE` BEFORE UPDATE ON `RES_FEATURES` FOR EACH ROW
   BEGIN
 	DECLARE msg varchar(255);
-    
+
     IF NEW.BedFeatureID not in (select TypeNameID from TYPE_NAME where UsageID = 'BedType' or UsageID = 'FeatureID') then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.BedFeatureID;
 		SET msg = concat(msg, ' is not a valid Bed/Feature Type');
 		SIGNAL sqlstate '45000' SET message_text = msg;
-	END; 
+	END;
    ELSEIF NEW.ProximityID not in (select TypeNameID from TYPE_NAME where UsageID = 'ProximityID' UNION SELECT NULL AS TypeNameID UNION SELECT 0 AS TypeNameID) then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.ProximityID;
@@ -1219,13 +1219,13 @@ USE `hollyhotel`$$
 CREATE TRIGGER `hollyhotel`.`STAY_CHARGES_BEFORE_INSERT` BEFORE INSERT ON `STAY_CHARGES` FOR EACH ROW
   BEGIN
 	DECLARE msg varchar(255);
-    
+
     IF NEW.ChargeType not in (select TypeNameID from TYPE_NAME where UsageID = 'ChargeType') then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.ChargeType;
 		SET msg = concat(msg, ' is not a valid Charge Type');
 		SIGNAL sqlstate '45000' SET message_text = msg;
-	END; 
+	END;
     END IF;
  END; $$
 
@@ -1236,13 +1236,13 @@ USE `hollyhotel`$$
 CREATE TRIGGER `hollyhotel`.`STAY_CHARGES_BEFORE_UPDATE` BEFORE UPDATE ON `STAY_CHARGES` FOR EACH ROW
   BEGIN
 	DECLARE msg varchar(255);
-    
+
     IF NEW.ChargeType not in (select TypeNameID from TYPE_NAME where UsageID = 'ChargeType') then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.ChargeType;
 		SET msg = concat(msg, ' is not a valid Charge Type');
 		SIGNAL sqlstate '45000' SET message_text = msg;
-	END; 
+	END;
     END IF;
  END; $$
 
@@ -1253,13 +1253,13 @@ USE `hollyhotel`$$
 CREATE TRIGGER `hollyhotel`.`MAINTENANCE_TICKET_BEFORE_INSERT` BEFORE INSERT ON `MAINTENANCE_TICKET` FOR EACH ROW
   BEGIN
 	DECLARE msg varchar(255);
-    
+
     IF NEW.MaintenanceType not in (select TypeNameID from TYPE_NAME where UsageID = 'MaintenanceType') then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.MaintenanceType;
 		SET msg = concat(msg, ' is not a valid Maintenance Type');
 		SIGNAL sqlstate '45000' SET message_text = msg;
-	END; 
+	END;
     ELSEIF IFNULL(NEW.EndDate,NEW.AnticipatedEndDate)<NEW.StartDate or NEW.AnticipatedEndDate<NEW.StartDate then
     BEGIN
 		SET msg = concat('End date(s) must be greater than the Start Date/time of the maintenance');
@@ -1275,13 +1275,13 @@ USE `hollyhotel`$$
 CREATE TRIGGER `hollyhotel`.`MAINTENANCE_TICKET_BEFORE_UPDATE` BEFORE UPDATE ON `MAINTENANCE_TICKET` FOR EACH ROW
   BEGIN
 	DECLARE msg varchar(255);
-    
+
     IF NEW.MaintenanceType not in (select TypeNameID from TYPE_NAME where UsageID = 'MaintenanceType') then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.MaintenanceType;
 		SET msg = concat(msg, ' is not a valid Maintenance Type');
 		SIGNAL sqlstate '45000' SET message_text = msg;
-	END; 
+	END;
     ELSEIF IFNULL(NEW.EndDate,NEW.AnticipatedEndDate)<NEW.StartDate or NEW.AnticipatedEndDate<NEW.StartDate then
     BEGIN
 		SET msg = concat('End date(s) must be greater than the Start Date/time of the maintenance');
@@ -1294,17 +1294,17 @@ CREATE TRIGGER `hollyhotel`.`MAINTENANCE_TICKET_BEFORE_UPDATE` BEFORE UPDATE ON 
 USE `hollyhotel`$$
 DROP TRIGGER IF EXISTS `BUILDWING_FEATURES_BEFORE_INSERT` $$
 USE `hollyhotel`$$
-CREATE TRIGGER `BUILDWING_FEATURES_BEFORE_INSERT` BEFORE INSERT ON `BUILDING_WING_FEATURES` 
+CREATE TRIGGER `BUILDWING_FEATURES_BEFORE_INSERT` BEFORE INSERT ON `BUILDING_WING_FEATURES`
   FOR EACH ROW
   BEGIN
 	DECLARE msg varchar(255);
-    
+
     IF NEW.FeatureID not in (select TypeNameID from TYPE_NAME where UsageID = 'FeatureID') then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.FeatureID;
 		SET msg = concat(msg, ' is not a valid Wing Feature');
 		SIGNAL sqlstate '45000' SET message_text = msg;
-	END; 
+	END;
     ELSEIF NEW.ProximityID not in (select TypeNameID from TYPE_NAME where UsageID = 'ProximityID') then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.ProximityID;
@@ -1312,7 +1312,7 @@ CREATE TRIGGER `BUILDWING_FEATURES_BEFORE_INSERT` BEFORE INSERT ON `BUILDING_WIN
 		SIGNAL sqlstate '45000' SET message_text = msg;
     END; #elseif
  END IF;
- END; 
+ END;
 
     $$
 
@@ -1320,17 +1320,17 @@ CREATE TRIGGER `BUILDWING_FEATURES_BEFORE_INSERT` BEFORE INSERT ON `BUILDING_WIN
 USE `hollyhotel`$$
 DROP TRIGGER IF EXISTS `BUILDWING_FEATURES_BEFORE_UPDATE` $$
 USE `hollyhotel`$$
-CREATE TRIGGER `BUILDWING_FEATURES_BEFORE_UPDATE` BEFORE UPDATE ON `BUILDING_WING_FEATURES` 
+CREATE TRIGGER `BUILDWING_FEATURES_BEFORE_UPDATE` BEFORE UPDATE ON `BUILDING_WING_FEATURES`
   FOR EACH ROW
   BEGIN
 	DECLARE msg varchar(255);
-    
+
     IF NEW.FeatureID not in (select TypeNameID from TYPE_NAME where UsageID = 'FeatureID') then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.FeatureID;
 		SET msg = concat(msg, ' is not a valid Wing Feature');
 		SIGNAL sqlstate '45000' SET message_text = msg;
-	END; 
+	END;
     ELSEIF NEW.ProximityID not in (select TypeNameID from TYPE_NAME where UsageID = 'ProximityID') then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.ProximityID;
