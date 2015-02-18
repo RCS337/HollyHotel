@@ -324,7 +324,7 @@ ENGINE = InnoDB
 COMMENT = 'Contains the specific information based on the type of prope' /* comment truncated */ /*rties that a room will have depending on the room type.  Room Requires at least one assignment (business logic)*/;
 
 
-CREATE INDEX `ROOM_DETAIL_RoomType_FK_idx` ON `ROOM_DETAIL` (`RoomType` ASC);
+#CREATE INDEX `ROOM_DETAIL_RoomType_FK_idx` ON `ROOM_DETAIL` (`RoomType` ASC);
 
 
 -- -----------------------------------------------------
@@ -349,7 +349,7 @@ CREATE TABLE IF NOT EXISTS `ROOM_ADJ` (
 ENGINE = InnoDB
 COMMENT = 'This table is used to define when a room is adjacent to anot' /* comment truncated */ /*her room.  In the case of sleeping rooms, there should only be one adjacancy, while in meeting, there can be multiple (business logic)*/;
 
-CREATE INDEX `fk_ROOM_ADJ_ROOM1_idx` ON `ROOM_ADJ` (`AdjacentRoomID` ASC);
+#CREATE INDEX `fk_ROOM_ADJ_ROOM1_idx` ON `ROOM_ADJ` (`AdjacentRoomID` ASC);
 
 
 -- -----------------------------------------------------
@@ -660,6 +660,19 @@ CREATE INDEX `fk_BUILDWING_FEATURES_TYPE_NAME1_idx1` ON `BUILDING_WING_FEATURES`
 
 USE `hollyhotel`;
 
+-- -----------------------------------------------------
+-- Table `USERS`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `USERS` ;
+
+CREATE TABLE IF NOT EXISTS `USERS` (
+  `userID` INT NOT NULL AUTO_INCREMENT COMMENT 'Surrogate Key',
+  `username` VARCHAR(50) NOT NULL COMMENT 'Login ID',
+  `password` VARCHAR(32) NOT NULL COMMENT 'Encrypted',
+  `email` VARCHAR(255) NULL COMMENT 'Allow to store email address',
+  `create_time` DATETIME NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Time Stamp',
+  PRIMARY KEY (`userID`))
+COMMENT = 'Simple table to implement basic authentication';
 
 
 /***************************************************************************************************************************************************************/
@@ -697,7 +710,7 @@ where c.CustomerType = 'C'
 
 ; $$
 
-
+/*************************************************************************************************************************************/
 DROP VIEW IF EXISTS BuildWingFeatVw $$
 
 CREATE VIEW BuildWingFeatVw AS
@@ -712,7 +725,7 @@ WHERE bwf.ProximityID not in (Select TypeNameID from Type_Name where UsageID='Pr
 GROUP by BuildingID, WingId; $$
 
 
-
+/*************************************************************************************************************************************/
 DROP VIEW IF EXISTS SleepRoomInfoVw $$
 
 CREATE VIEW SleepRoomInfoVw AS
@@ -742,7 +755,7 @@ JOIN Type_Name bd on bd.TypeNameID=rb.BedType
 group by r.RoomID
 ; $$
 
-
+/*************************************************************************************************************************************/
 
 
 DROP VIEW IF EXISTS RoomsBookedVw $$
@@ -772,6 +785,10 @@ SELECT
 from MAINTENANCE_TICKET
 WHERE EndDate is NULL
 ; $$
+/*************************************************************************************************************************************/
+
+
+
 
 
 /***************************************************************************************************************************************************************
@@ -838,7 +855,103 @@ BEGIN
     
 END; $$
 
+/*************************************************************************************************************************************************************/
+DROP PROCEDURE IF EXISTS `InsUpStdReservationSp`; $$
 
+CREATE PROCEDURE `InsUpStdReservationSp` (
+  pReservationID INT
+, pParentResID	INT
+, pBillToID		INT
+, pGuestID		INT
+, pEventID		INT
+, pRoomType		INT
+, pStartDate		DATETIME
+, pEndDate		DATETIME
+, pRate			DEC(12,2)
+, pDeposit		DEC(12,2)
+, pRoomID		INT
+, pSmoking		INT
+, pFEATURES		VARCHAR(255)
+
+)
+BEGIN
+
+	# parse out the text in pFEATURES into tmp_Res_Features
+
+	DECLARE PrevDel INT Default 1;
+	DECLARE NextDel INT Default 1;
+    DECLARE i		INT DEFAULT 0;
+	DECLARE str CHAR(5);
+    
+    DROP TABLE IF EXISTS tmp_RES_FEATURES;
+	CREATE TEMPORARY TABLE  tmp_RES_FEATURES (
+	ReservationID		Int
+    , FeatureSequence	Int
+	, Bed_FeatureID		Int
+	, ProximityID		Int);
+	parse_loop: LOOP
+		Set NextDel = Locate('|',pFEATURES,PrevDel);
+		if NextDel = 0 then 
+			SET NextDel = LENGTH(pFeatures)+1;
+		elseif NextDel =1 then 
+			begin
+			Set PrevDel = 2;
+			Set NextDel = Locate('|',pFEATURES,PrevDel);
+			end;
+		end if;
+		Set str = SUBSTR(pFEATURES,PrevDel,NextDel-PrevDel);
+	if str='' then
+		LEAVE parse_loop;
+	end if;
+
+	INSERT INTO tmp_RES_FEATURES (Bed_FeatureID, ProximityID, FeatureSequence) values(SUBSTRING_INDEX(str,',',1),SUBSTRING_INDEX(str,',',-1),i);
+		Set PrevDel = NextDel+1;
+        Set i=i+1;
+	end LOOP parse_loop;
+
+	IF pBillToId is not null then  #only really required input
+  
+		#LOOKUP VALUES FROM PARENT 
+		IF pParentResID is not Null then
+		SELECT IFNULL(pEventID,EventID), IFNULL(pRoomType,RoomType), IFNULL(pStartDate,StartDate), IFNULL(pEndDate,EndDate), IFNULL(pRate, Rate), IFNULL(pFEATURES,FEATURES) 
+		INTO pEventID, pRoomType, pStartDate, pEndDate, pRate, pFeatures
+		FROM ReservationSummaryVw ;
+		END IF;
+		
+        IF pReservationID is Null then
+			BEGIN
+			INSERT INTO RESERVATION (ParentResID, BillToID, GuestID, EventID, RoomType, StartDate, EndDate, Rate, Deposit, RoomID, Smoking) 
+				VALUES (pParentResID, pBillToID, pGuestID, pEventID, pRoomType, pStartDate, pEndDate, pRate, pDeposit, pRoomID, pSmoking);
+			SELECT LAST_INSERT_ID() into pReservationID;
+			END;
+        ELSE
+			BEGIN
+				UPDATE RESERVATION SET
+						  ParentResID 	= pParentResID
+                        , BillToID 		= pBillToID
+                        , GuestID		= pGuestID
+                        , EventID		= pEventID
+                        , RoomType		= pRoomType
+                        , StartDate		= pStartDate
+                        , EndDate		= pEndDate
+                        , Rate			= pRate
+                        , Deposit		= pDeposit
+                        , RoomID		= pRoomID
+                        , Smoking		= pSmoking
+				WHERE ReservationID=pReservationID;
+            END;
+        END IF; #pReservationID is Null
+		
+        
+        #now set the room features.  better way of doing this, but this is the easiest to code
+        DELETE FROM RES_FEATURES WHERE ReservationID = pReservationID;
+        INSERT INTO RES_FEATURES (SELECT pReservationID, FeatureSequence, Bed_featureID, ProximityID from tmp_RES_FEATURES);
+
+
+		END IF; #PBillToID is not null
+        drop table tmp_RES_FEATURES;
+End;$$
+/*****************************************************************************************************************************************************************/
 
 
 DROP PROCEDURE IF EXISTS `InsertStaySp`; $$
@@ -1066,7 +1179,7 @@ CREATE TRIGGER `hollyhotel`.`RES_FEATURES_BEFORE_INSERT` BEFORE INSERT ON `RES_F
 		SET msg = concat(msg, ' is not a valid Bed/Feature Type');
 		SIGNAL sqlstate '45000' SET message_text = msg;
 	END; 
-   ELSEIF NEW.ProximityID not in (select TypeNameID from TYPE_NAME where UsageID = 'ProximityID') then
+   ELSEIF NEW.ProximityID not in (select TypeNameID from TYPE_NAME where UsageID = 'ProximityID' UNION SELECT NULL AS TypeNameID UNION SELECT 0 AS TypeNameID ) then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.ProximityID;
 		SET msg = concat(msg, ' is not a valid Proximity Type');
@@ -1090,7 +1203,7 @@ CREATE TRIGGER `hollyhotel`.`RES_FEATURES_BEFORE_UPDATE` BEFORE UPDATE ON `RES_F
 		SET msg = concat(msg, ' is not a valid Bed/Feature Type');
 		SIGNAL sqlstate '45000' SET message_text = msg;
 	END; 
-   ELSEIF NEW.ProximityID not in (select TypeNameID from TYPE_NAME where UsageID = 'ProximityID') then
+   ELSEIF NEW.ProximityID not in (select TypeNameID from TYPE_NAME where UsageID = 'ProximityID' UNION SELECT NULL AS TypeNameID UNION SELECT 0 AS TypeNameID) then
     BEGIN
 		SELECT IFNULL(`Name`,'')  INTO msg from Type_Name where TypeNameID=NEW.ProximityID;
 		SET msg = concat(msg, ' is not a valid Proximity Type');
