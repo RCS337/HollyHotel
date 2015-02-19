@@ -53,7 +53,53 @@ group by r.ReservationID
 
 ;
 $$ 
- 
+
+/*************************************************************************************************************************************/
+DROP VIEW IF EXISTS `StayInfoVw` $$
+
+CREATE VIEW `StayInfoVw` AS
+SELECT 
+s.StayID
+,s.BillToID
+,c.FirstName as BillToFirstName
+,c.LastName  as BillToLastName
+, s.GuestID
+, c2.FirstName as GuestFirstName
+, c2.LastName as GuestLastName
+, s.EventID
+, e.EventName
+, e.HostID
+, c3.FirstName as HostFirstName
+, c3.LastName as HostLastName
+, s.ReservationID
+, r.Rate	ReservationRate
+, rm.Rate	RoomRate
+, s.RoomID
+, s.RoomType
+, rt.Name as RoomTypeName
+, s.CheckIn
+, s.AnticipatedCheckOut
+, s.CheckOut
+
+, GROUP_CONCAT(concat(rf.Bed_FeatureID,',',rf.ProximityID) SEPARATOR'|')  as Features
+, GROUP_CONCAT(case rf.qty when 1 then tn.Name else concat(rf.qty,'-', tn.Name,'s') end order by rf.Bed_FeatureID) as Feature_Description
+
+FROM STAY s
+JOIN RoomFeaturesVw rf on rf.RoomID=s.RoomID
+JOIN TYPE_NAME tn on rf.Bed_FeatureID=TypeNameID
+JOIN CUSTOMER c on c.CustomerID=s.BillToID
+Left Outer Join CUSTOMER c2 on c2.CustomerID=s.GuestID
+LEFT Outer Join `EVENT` e on e.EventID=s.EventID
+LEFT OUTER JOIN CUSTOMER c3 on c3.CustomerID=e.HostID
+LEFT OUTER JOIN RESERVATION r on r.ReservationID=s.ReservationID
+JOIN TYPE_NAME rt on rt.TypeNameID=s.RoomType
+JOIN ROOM_DETAIL rm on rm.RoomID=s.RoomID and rm.RoomType=s.RoomType
+
+WHERE IFNULL(s.Checkout,NOW()) >= DATE_ADD(NOW(), INTERVAL -14 DAY)
+group by s.StayID;$$ 
+
+
+ /*******************************************************************************************************************************************/
 DROP PROCEDURE IF EXISTS `GetAvailablityByFeaturesSp`; $$
 
 CREATE PROCEDURE `GetAvailablityByFeaturesSp` (
@@ -153,5 +199,84 @@ select * from tmp_reservationmap order by Rate, RoomRank;
 #select i;
 END;
 $$
+
+
+DROP PROCEDURE IF EXISTS `CaldStayBalanceSp`; $$
+
+CREATE PROCEDURE `CaldStayBalanceSp` (
+pStayID		Int
+, pCustomerID Int )
+
+BEGIN
+ DECLARE BALANCE DEC(12,2);
+ 
+ SELECT SUM(AMOUNT) into BALANCE FROM STAY_CHARGES WHERE StayID=pStayID and ChargeTo=pCustomerID;
+ 
+ IF BALANCE = 0 THEN
+	UPDATE STAY_CHARGES SET PaidDate = NOW();
+END IF;
+
+END;$$
+
+
+/*************************************************************************************************************************************/
+
+DROP PROCEDURE IF EXISTS `MakePaymentSp`; $$
+
+CREATE PROCEDURE `MakePaymentSp` (
+pStayID		Int
+, pCustomerID Int
+, pAmount	DEC(12,2)
+, pPaymentType Int
+)
+Begin
+if (pStayID is not null and pCustomerID is not null )then
+   begin
+
+		if IFNULL(pPaymentType,0) =0 THEN
+			SELECT TypeNameID into pPaymentType from Type_Name where UsageID = 'ChargeType' and Name = 'Payment';
+		end if;
+
+
+   INSERT INTO STAY_CHARGES(STAYID, ChargeTo, ChargeType, Amount, ChargeDate, DueDate, PaidDate) 
+		values (StayId, pCustomerID, pPaymentType,-1*pAmount, Now(), Now(), Now());
+    
+   
+   CALL CalStayBalanceSp(pStayID, pCustomerID); #IF ZERO, CLOSES THE CHARGES
+    end;
+end if; 
+
+End;$$
+
+
+/*************************************************************************************************************************************/
+
+DROP PROCEDURE IF EXISTS `GenerateCleaningRequestSp`; $$
+
+CREATE PROCEDURE `GenerateCleaningRequestSp` (
+pRoomID int )
+BEGIN
+    
+    insert into MAINTENANCE_TICKET(RoomID, StartDate, AnticipatedEndDate, MaintenanceType) Values(pRoomID, Now(), ADDTIME(CONVERT(curdate(),DATETIME),'0 15:00:00.0'), (SELECT TASKNAMEID from TASK_NAME WHERE UsageID='MaintenanceType' and Name='Cleaning'));
+
+END;$$
+
+
+/*************************************************************************************************************************************/
+
+DROP PROCEDURE IF EXISTS `CheckOutSp`; $$
+
+CREATE PROCEDURE `CheckOutSp` (
+pStayID int )
+BEGIN
+DECLARE vROOMID INT;
+
+	SELECT RoomID into vROOMID from STAY WHERE STAYID=pStayID;
+	UPDATE STAY SET CheckOut=NOW() WHERE StayID=pStayID;
+    
+    CALL GenerateCleaningRequestSp(vROOMID);
+
+END;$$
+
 
 DELIMITER ;

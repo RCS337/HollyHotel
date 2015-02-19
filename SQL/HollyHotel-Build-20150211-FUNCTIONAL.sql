@@ -425,6 +425,7 @@ CREATE TABLE IF NOT EXISTS `STAY` (
   `ReservationID` INT NULL COMMENT 'Informational field that points back to the reservation that this record originated from.  Not required',
   `EventID` INT NULL COMMENT 'If the stay is part of an event, this value can be assigned.  Added to this table to find the responsible party',
   `RoomID` INT NOT NULL COMMENT 'Links the room to the reservation',
+  `RoomType` INT NOT NULL COMMENT 'Specifies how the room is utilized',
   `CheckIn` DATETIME NOT NULL COMMENT 'Time that that stay begins',
   `CheckOut` DATETIME NULL COMMENT 'Actual Checkout time',
   `AnticipatedCheckOut` DATETIME NULL COMMENT 'This column is used to all the scheduler to figure out when a room will be available again when it is currently being occupied.  When converted over from a Reservation, this is the CheckOut date',
@@ -453,19 +454,24 @@ CREATE TABLE IF NOT EXISTS `STAY` (
     FOREIGN KEY (`RoomID`)
     REFERENCES `ROOM` (`RoomID`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON UPDATE NO ACTION,
+CONSTRAINT `STAY_RoomType_FK`
+    FOREIGN KEY (`RoomType`)
+    REFERENCES `TYPE_NAME` (`TypeNameID`)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT)
 ENGINE = InnoDB
 COMMENT = 'This table is used to store the details of the Stay.  A reco' /* comment truncated */ /*rd is created for each room that is checked out to a Guest.  Records can be created from a reservation, though they do not need to be*/;
 
-CREATE INDEX `fk_STAY_CUSTOMER1_idx` ON `STAY` (`BillToID` ASC);
+#CREATE INDEX `fk_STAY_CUSTOMER1_idx` ON `STAY` (`BillToID` ASC);
 
-CREATE INDEX `fk_STAY_CUSTOMER1_idx1` ON `STAY` (`GuestID` ASC);
+#CREATE INDEX `fk_STAY_CUSTOMER1_idx1` ON `STAY` (`GuestID` ASC);
 
-CREATE INDEX `fk_STAY_RESERVATION1_idx` ON `STAY` (`ReservationID` ASC);
+#CREATE INDEX `fk_STAY_RESERVATION1_idx` ON `STAY` (`ReservationID` ASC);
 
-CREATE INDEX `fk_STAY_EVENT1_idx` ON `STAY` (`EventID` ASC);
+#CREATE INDEX `fk_STAY_EVENT1_idx` ON `STAY` (`EventID` ASC);
 
-CREATE INDEX `fk_STAY_ROOM1_idx` ON `STAY` (`RoomID` ASC);
+#CREATE INDEX `fk_STAY_ROOM1_idx` ON `STAY` (`RoomID` ASC);
 
 
 -- -----------------------------------------------------
@@ -856,7 +862,50 @@ group by r.ReservationID
 
 ;
 $$
-/*****************************************************************************************************************************************/
+
+/*************************************************************************************************************************************/
+DROP VIEW IF EXISTS `StayInfoVw` $$
+
+CREATE VIEW `StayInfoVw` AS
+SELECT 
+s.StayID
+,s.BillToID
+,c.FirstName as BillToFirstName
+,c.LastName  as BillToLastName
+, s.GuestID
+, c2.FirstName as GuestFirstName
+, c2.LastName as GuestLastName
+, s.EventID
+, e.EventName
+, e.HostID
+, c3.FirstName as HostFirstName
+, c3.LastName as HostLastName
+, s.ReservationID
+, r.Rate	ReservationRate
+, rm.Rate	RoomRate
+, s.RoomID
+, s.RoomType
+, rt.Name as RoomTypeName
+, s.CheckIn
+, s.AnticipatedCheckOut
+, s.CheckOut
+
+, GROUP_CONCAT(concat(rf.Bed_FeatureID,',',rf.ProximityID) SEPARATOR'|')  as Features
+, GROUP_CONCAT(case rf.qty when 1 then tn.Name else concat(rf.qty,'-', tn.Name,'s') end order by rf.Bed_FeatureID) as Feature_Description
+
+FROM STAY s
+JOIN RoomFeaturesVw rf on rf.RoomID=s.RoomID
+JOIN TYPE_NAME tn on rf.Bed_FeatureID=TypeNameID
+JOIN CUSTOMER c on c.CustomerID=s.BillToID
+Left Outer Join CUSTOMER c2 on c2.CustomerID=s.GuestID
+LEFT Outer Join `EVENT` e on e.EventID=s.EventID
+LEFT OUTER JOIN CUSTOMER c3 on c3.CustomerID=e.HostID
+LEFT OUTER JOIN RESERVATION r on r.ReservationID=s.ReservationID
+JOIN TYPE_NAME rt on rt.TypeNameID=s.RoomType
+JOIN ROOM_DETAIL rm on rm.RoomID=s.RoomID and rm.RoomType=s.RoomType
+
+WHERE IFNULL(s.Checkout,NOW()) >= DATE_ADD(NOW(), INTERVAL -14 DAY)
+group by s.StayID;$$ 
 
 
 /***************************************************************************************************************************************************************
@@ -1106,12 +1155,14 @@ CREATE PROCEDURE `InsertStaySp` (
 , pReservationID	INT
 , pEventID		Int
 , pRoomID	Int
+, pRoomType Int
 , pAnticipatedCheckOut	DateTime
 , pRate DEC(12,2)
+, pDeposit DEC(12,2)
 
 )
 BEGIN
-	DECLARE StayID INT;
+	DECLARE StayID, StayLength, i INT;
 
 	if pBillToID is not null then
     Begin
@@ -1122,11 +1173,15 @@ BEGIN
             ,	IFNULL(pEventID,r.EventID)
             , 	IFNULL(pAnticipatedCheckOut, r.EndDate)
             , 	IFNULL(pRate,r.Rate)
+            , 	IFNULL(pDeposit,r.Deposit)
+            , 	IFNULL(pRoomType,r.RoomType)
 
             into pGuestID
 			,	pEventID
             , 	pAnticipatedCheckOut
             ,	pRate
+            , 	pDeposit
+            ,	pRoomType
             FROM RESERVATION r where r.ReservationID=pReservationID;
 
             UPDATE RESERVATION SET ConvertedToStay = 1 where ReservationID = pReservationID;
@@ -1135,12 +1190,23 @@ BEGIN
             END;
 		END IF;
 
-		INSERT INTO STAY (BillToID, GuestID, ReservationID, EventID, RoomID, CheckIn, AnticipatedCheckOut) values (pBillToID, pGuestID, pReservationID, pEventID, pRoomID, NOW(), pAnticipatedCheckOut);
+		INSERT INTO STAY (BillToID, GuestID, ReservationID, EventID, RoomID, RoomType, CheckIn, AnticipatedCheckOut) values (pBillToID, pGuestID, pReservationID, pEventID, pRoomID, pRoomType, NOW(), pAnticipatedCheckOut);
 		SELECT LAST_INSERT_ID() into StayID;
+	
+    
+		SET STAYLENGTH = DATEDIFF(pAnticipatedCheckOut,CURDATE());
+        SET i=0;
+		WHILE i <STAYLENGTH DO 
+        
+        INSERT INTO STAY_CHARGES(STAYID, ChargeTo, ChargeType, Amount, ChargeDate, DueDate) 
+        values (StayId, pBillToID, (SELECT TypeNameID from Type_Name where UsageID = 'ChargeType' and Name = 'Room Charges'),pRate, DATEADD(CURDATE(),i), pAnticipatedCheckOut);
+		set i=i+1;
+        END WHILE;
 
-        INSERT INTO STAY_CHARGES(STAYID, ChargeTo, ChargeType, Amount, ChargeDate, DueDate) values (StayId, pBillToID, (SELECT TypeNameID from Type_Name where UsageID = 'ChargeType' and Name = 'Room Charges'),pRate, NOW(), pAnticipatedCheckOut);
-
-
+		IF IFNULL(pDeposit,0)<> 0 THEN
+                INSERT INTO STAY_CHARGES(STAYID, ChargeTo, ChargeType, Amount, ChargeDate, DueDate) 
+					values (StayId, pBillToID, (SELECT TypeNameID from Type_Name where UsageID = 'ChargeType' and Name = 'Deposit'),-1*pRate, Now(), pAnticipatedCheckOut);
+        END IF;
 
 		End;
 
@@ -1253,6 +1319,83 @@ select * from tmp_reservationmap order by Rate, RoomRank;
 END;
 $$
 
+/*************************************************************************************************************************************************************/
+DROP PROCEDURE IF EXISTS `CalStayBalanceSp`; $$
+
+CREATE PROCEDURE `CalStayBalanceSp` (
+pStayID		Int
+, pCustomerID Int )
+
+BEGIN
+ DECLARE BALANCE DEC(12,2);
+ 
+ SELECT SUM(AMOUNT) into BALANCE FROM STAY_CHARGES WHERE StayID=pStayID and ChargeTo=pCustomerID;
+ 
+ IF BALANCE = 0 THEN
+	UPDATE STAY_CHARGES SET PaidDate = NOW();
+END IF;
+
+END;$$
+
+
+/*************************************************************************************************************************************/
+
+DROP PROCEDURE IF EXISTS `MakePaymentSp`; $$
+
+CREATE PROCEDURE `MakePaymentSp` (
+pStayID		Int
+, pCustomerID Int
+, pAmount	DEC(12,2)
+, pPaymentType Int
+)
+Begin
+if (pStayID is not null and pCustomerID is not null )then
+   begin
+
+		if IFNULL(pPaymentType,0) =0 THEN
+			SELECT TypeNameID into pPaymentType from Type_Name where UsageID = 'ChargeType' and Name = 'Deposit';
+		end if;
+
+
+   INSERT INTO STAY_CHARGES(STAYID, ChargeTo, ChargeType, Amount, ChargeDate, DueDate, PaidDate) 
+		values (StayId, pCustomerID, (SELECT TypeNameID from Type_Name where UsageID = 'ChargeType' and Name = 'Payment'),-1*pAmount, Now(), Now(), Now());
+    
+   
+   CALL CalStayBalanceSp(pStayID, pCustomerID); #IF ZERO, CLOSES THE CHARGES
+    end;
+end if; 
+
+End;$$
+/*************************************************************************************************************************************/
+
+DROP PROCEDURE IF EXISTS `GenerateCleaningRequestSp`; $$
+
+CREATE PROCEDURE `GenerateCleaningRequestSp` (
+pRoomID int )
+BEGIN
+    
+    insert into MAINTENANCE_TICKET(RoomID, StartDate, AnticipatedEndDate, MaintenanceType) Values(pRoomID, Now(), ADDTIME(CONVERT(curdate(),DATETIME),'0 15:00:00.0'), (SELECT TASKNAMEID from TASK_NAME WHERE UsageID='MaintenanceType' and Name='Cleaning'));
+
+END;$$
+
+
+/*************************************************************************************************************************************/
+
+DROP PROCEDURE IF EXISTS `CheckOutSp`; $$
+
+CREATE PROCEDURE `CheckOutSp` (
+pStayID int )
+BEGIN
+DECLARE vROOMID INT;
+
+	SELECT RoomID into vROOMID from STAY WHERE STAYID=pStayID;
+	UPDATE STAY SET CheckOut=NOW() WHERE StayID=pStayID;
+    
+    CALL GenerateCleaningRequestSp(vROOMID);
+
+END;$$
+
+/***************************************************************************************************************************************************************/
 
 
 /***************************************************************************************************************************************************************
