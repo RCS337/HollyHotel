@@ -21,13 +21,13 @@ INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'WingID', 'No
 INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'WingID', 'East Wing', NULL);
 INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'WingID', 'South Wing', NULL);
 INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'WingID', 'West Wing', NULL);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'Single Bed', 1);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'Double Bed', 2);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'Queen Bed', 3);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'King Bed', 4);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'Fold Out Couch', 0);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'Roll-Away Bed', 0);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'Hide-Away Bed (Wall)', 0);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'Single Bed', 2);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'Double Bed', 3);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'Queen Bed', 4);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'King Bed', 5);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'Fold Out Couch', 1);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'Roll-Away Bed', 1);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'BedType', 'Hide-Away Bed (Wall)', 1);
 INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'RoomType', 'Sleeping', NULL);
 INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'RoomType', 'Meeting', NULL);
 INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'RoomType', 'Suite', NULL);
@@ -36,11 +36,11 @@ INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'MealID', 'Lu
 INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'MealID', 'Dinner', 3);
 INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'MealID', 'Bar', 4);
 
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'FeatureID', 'Indoor Pool', 0);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'FeatureID', 'Outdoor Pool', 0);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'FeatureID', 'Parking Garage', 0);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'FeatureID', 'Loading Dock', 0);
-INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'FeatureID', 'Handicap Accessible', 0);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'FeatureID', 'Indoor Pool', 4);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'FeatureID', 'Outdoor Pool', 3);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'FeatureID', 'Parking Garage', 1);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'FeatureID', 'Loading Dock', 1);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'FeatureID', 'Handicap Accessible', 2);
 
 INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'ProximityID', 'None', 0);
 INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'ProximityID', 'Near', 1);
