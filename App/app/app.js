@@ -29,6 +29,10 @@ angular.module('ProtoApp', ['ngRoute', 'ui.bootstrap'])
                 controller: 'MainController',
                 templateUrl: 'views/checkin.html'
             })
+            .when('/checkin/:guestID', {
+                controller: 'MainController',
+                templateUrl: 'views/checkinGuest.html'
+            })
             .when('/checkout', {
                 controller: 'MainController',
                 templateUrl: 'views/checkout.html'

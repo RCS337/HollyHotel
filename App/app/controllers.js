@@ -13,8 +13,13 @@ angular.module('ProtoApp')
         $scope.init = function () {
             // Get Guest List
             $scope.getAll();
+            // Check for guest details
+            if($routeParams.guestID) {
+                $scope.guest = $routeParams.guestID;
+                $scope.getDetails();
+            }
             // Set default max number of entries to show per page
-            $scope.entryLimit = 10;
+            $scope.entryLimit = 5;
             // Set max number of pages to show in pagination
             $scope.maxSize = 10;
             // Set default current page for pagination
@@ -33,6 +38,11 @@ angular.module('ProtoApp')
                 console.log(err);
             })
         };
+        $scope.getDetails = function(){
+            $http.post('../ajax/guestDetails.php', { CustomerID: $scope.guest }).success(function(res) {
+                $scope.guestDetails = res;
+            })
+        };
         $scope.getSingle = function () {
             // $scope.guestID = $routeParams.guestID;
             // console.log($scope.guestID);
@@ -44,7 +54,57 @@ angular.module('ProtoApp')
                 console.log(err);
             })
         }; // end getSingle
-
+        $scope.searchGuests = function () {
+            $http.post('../ajax/searchGuests.php', $scope.formData) .success(function(res) {
+                $scope.searchResults = res;
+                $scope.searchItems = $scope.searchResults.length;
+                $scope.searchLimit = 8;
+            })
+        };
+        // On filter, set filteredItems length after a 10 millisecond delay
+        $scope.filter = function () {
+            $timeout( function () {
+                $scope.filteredItems = $scope.filtered.length;
+            }, 10);
+        };
+        // Sort items
+        $scope.sort = function(predicate) {
+            $scope.predicate = predicate;
+            $scope.reverse = !$scope.reverse;
+        };
+        $scope.setPage = function (pageNo) {
+            $scope.currentPage = pageNo;
+            console.log(pageNo);
+        };
+         // Run initializing function
+        $scope.init();
+    })
+    .controller('CheckInCtrl', function ($scope, $http, $timeout, $routeParams) {
+        $scope.init = function () {
+            // Get Available Rooms
+            $scope.getRooms();
+            // Check for guest details
+            if($routeParams.guestID) {
+                $scope.guest = $routeParams.guestID;
+                $scope.getGuestDetails();
+            }
+            // Set default max number of entries to show per page
+            $scope.entryLimit = 5;
+            // Set max number of pages to show in pagination
+            $scope.maxSize = 10;
+            // Set default current page for pagination
+            $scope.currentPage = 1;
+        };
+        $scope.getRooms = function(){
+                $http.post('../ajax/getAvailableRooms.php').success(function(res) {
+                $scope.rooms = res;
+            })
+        };
+        $scope.getGuestDetails = function(){
+            $http.post('../ajax/guestDetails.php', { CustomerID: $scope.guest }).success(function(res) {
+                $scope.guestDetails = res;
+            })
+        };
         // On filter, set filteredItems length after a 10 millisecond delay
         $scope.filter = function () {
             $timeout( function () {
