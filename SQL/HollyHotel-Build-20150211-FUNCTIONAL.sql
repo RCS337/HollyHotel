@@ -817,6 +817,28 @@ join BUILDING_WING_FEATURES bwf on bwf.BuildingID=r.BuildingID and bwf.WingID=r.
 Order by RoomID;
 $$
 
+/******************************************************************************************************************************************************/
+DROP VIEW IF EXISTS roomfeaturesvw $$
+
+CREATE VIEW roomfeaturesvw AS 
+select RoomID AS RoomID
+,BedType AS Bed_FeatureID
+,0 AS ProximityID
+,count(RoomID) AS Qty 
+from room_beds 
+group by RoomID,BedType 
+union 
+select r.RoomID AS RoomID
+,bwf.FeatureID AS Bed_FeatureID
+,bwf.ProximityID AS ProximityID
+,1 AS Qty 
+from 
+room r 
+join building_wing_features bwf on bwf.BuildingID = r.BuildingID and bwf.WingID = r.WingID
+;$$
+
+/************************************************************************************************************************************************************/
+
 DROP VIEW IF EXISTS ReservationInfoVw $$
 
 CREATE VIEW ReservationInfoVw AS
@@ -884,6 +906,7 @@ s.StayID
 , r.Rate	ReservationRate
 , rm.Rate	RoomRate
 , s.RoomID
+, room.RoomNumber
 , s.RoomType
 , rt.Name as RoomTypeName
 , s.CheckIn
@@ -903,9 +926,59 @@ LEFT OUTER JOIN CUSTOMER c3 on c3.CustomerID=e.HostID
 LEFT OUTER JOIN RESERVATION r on r.ReservationID=s.ReservationID
 JOIN TYPE_NAME rt on rt.TypeNameID=s.RoomType
 JOIN ROOM_DETAIL rm on rm.RoomID=s.RoomID and rm.RoomType=s.RoomType
+join ROOM  on room.RoomID=s.RoomID
 
 WHERE IFNULL(s.Checkout,NOW()) >= DATE_ADD(NOW(), INTERVAL -14 DAY)
 group by s.StayID;$$ 
+
+
+/*******************************************************************************************************************************************/
+DROP VIEW IF EXISTS `StayChargesVw` $$
+
+CREATE VIEW `StayChargesVw` AS
+SELECT 
+sc.StayID
+, s.RoomID
+, rm.RoomNumber
+, sc.ChargeTo
+, c.FirstName 
+, c.LastName
+, sc.ChargeType
+, ct.Name as ChargeDesc
+, sc.ChargeDescription
+, sc.Amount
+, sc.ChargeDate
+, sc.DueDate
+, sc.PaidDate
+
+from STAY_CHARGES sc
+join TYPE_NAME ct on ct.TypeNameID=sc.ChargeType
+join STAY s on s.StayID-sc.StayID
+join ROOM rm on rm.RoomID=s.RoomID
+JOIN CUSTOMER c on c.CustomerID=sc.ChargeTo
+
+WHERE IFNULL(s.Checkout,NOW()) >= DATE_ADD(NOW(), INTERVAL -14 DAY) 
+#COMMENT 'USED TO SUMMARIZE CHARGES WITHOUT CREATING JOINS IN THE UI'
+;$$
+
+/************************************************************************************/
+DROP VIEW IF EXISTS `OpenMaintTicketsVw` $$
+
+CREATE VIEW `OpenMaintTicketsVw` AS
+
+SELECT 
+mt.MaintTicketID
+, mt.RoomID
+, r.RoomNumber
+, mt.StartDate
+, mt.AnticipatedEndDate
+, mt.MaintenanceType
+, tn.Name as MaintTypeDesc
+, mt.TaskDescription
+FROM MAINTENANCE_TICKET mt
+JOIN ROOM r  on r.RoomID=mt.RoomID
+join Type_Name tn on tn.TypeNameID=mt.MaintenanceType
+where EndDate is null;$$
 
 
 /***************************************************************************************************************************************************************
@@ -1320,19 +1393,19 @@ END;
 $$
 
 /*************************************************************************************************************************************************************/
-DROP PROCEDURE IF EXISTS `CalStayBalanceSp`; $$
+DROP PROCEDURE IF EXISTS `CalcStayBalanceSp`; $$
 
-CREATE PROCEDURE `CalStayBalanceSp` (
+CREATE PROCEDURE `CalcStayBalanceSp` (
 pStayID		Int
 , pCustomerID Int )
-
+COMMENT 'marks all stay charges as paid if balance is zero '
 BEGIN
  DECLARE BALANCE DEC(12,2);
  
  SELECT SUM(AMOUNT) into BALANCE FROM STAY_CHARGES WHERE StayID=pStayID and ChargeTo=pCustomerID;
  
  IF BALANCE = 0 THEN
-	UPDATE STAY_CHARGES SET PaidDate = NOW();
+	UPDATE STAY_CHARGES SET PaidDate = NOW() where PaidDate is NULL;
 END IF;
 
 END;$$
@@ -1348,20 +1421,21 @@ pStayID		Int
 , pAmount	DEC(12,2)
 , pPaymentType Int
 )
+COMMENT 'inserts a PAYMENT record for a STAY, and calls CalcStayBalanceSp '
 Begin
 if (pStayID is not null and pCustomerID is not null )then
    begin
 
 		if IFNULL(pPaymentType,0) =0 THEN
-			SELECT TypeNameID into pPaymentType from Type_Name where UsageID = 'ChargeType' and Name = 'Deposit';
+			SELECT TypeNameID into pPaymentType from Type_Name where UsageID = 'ChargeType' and Name = 'Payment';
 		end if;
 
 
    INSERT INTO STAY_CHARGES(STAYID, ChargeTo, ChargeType, Amount, ChargeDate, DueDate, PaidDate) 
-		values (StayId, pCustomerID, (SELECT TypeNameID from Type_Name where UsageID = 'ChargeType' and Name = 'Payment'),-1*pAmount, Now(), Now(), Now());
+		values (StayId, pCustomerID, pPaymentType,-1*pAmount, Now(), Now(), Now());
     
    
-   CALL CalStayBalanceSp(pStayID, pCustomerID); #IF ZERO, CLOSES THE CHARGES
+   CALL CalcStayBalanceSp(pStayID, pCustomerID); #IF ZERO, CLOSES THE CHARGES
     end;
 end if; 
 
@@ -1370,13 +1444,14 @@ End;$$
 
 DROP PROCEDURE IF EXISTS `GenerateCleaningRequestSp`; $$
 
-CREATE PROCEDURE `GenerateCleaningRequestSp` (
-pRoomID int )
+CREATE PROCEDURE `GenerateCleaningRequestSp` (pRoomID int )
+COMMENT 'inserts a Cleaning record for a room with an anticipated end time of 3pm'
 BEGIN
     
     insert into MAINTENANCE_TICKET(RoomID, StartDate, AnticipatedEndDate, MaintenanceType) Values(pRoomID, Now(), ADDTIME(CONVERT(curdate(),DATETIME),'0 15:00:00.0'), (SELECT TASKNAMEID from TASK_NAME WHERE UsageID='MaintenanceType' and Name='Cleaning'));
 
-END;$$
+END 
+;$$
 
 
 /*************************************************************************************************************************************/
@@ -1385,6 +1460,7 @@ DROP PROCEDURE IF EXISTS `CheckOutSp`; $$
 
 CREATE PROCEDURE `CheckOutSp` (
 pStayID int )
+COMMENT 'closes out a stay and then calls GenerateCleaningRequestSp '
 BEGIN
 DECLARE vROOMID INT;
 
@@ -1395,7 +1471,88 @@ DECLARE vROOMID INT;
 
 END;$$
 
-/***************************************************************************************************************************************************************/
+*************************************************************************************************************************************/
+
+DROP PROCEDURE IF EXISTS `ReassignRoomSp`; $$
+
+CREATE PROCEDURE `ReassignRoomSp` (
+pOldStayID	int
+,pNewRoomID int
+,pNewRate 	int)
+COMMENT 'CLOSES OUT CURRENT ROOM, COPIES INFO TO NEW ROOM, AND CHARGES'
+
+BEGIN
+DECLARE vBillToID, vGuestID, vReservationID, vEventID, vRoomType, vNewStayID, vRoomCharges, vBalanceTransfer INT;
+DECLARE vAnticipatedCheckOut DATETIME;
+DECLARE vBALANCE, vDeposit DEC(12,2) default 0;
+
+SELECT TypeNameID into vRoomCharges from Type_Name where UsageID = 'ChargeType' and Name = 'Room Charges';
+SELECT TypeNameID into vBalanceTransfer from Type_Name where UsageID = 'ChargeType' and Name = 'Balance Transfer';
+
+
+# First set up a new stay with the new room, deposit is zero as we will copy those over
+    Select BillToID, GuestID, ReservationID, EventID, RoomType, AnticipatedCheckOut, IFNULL(pNewRate,ReservationRate) INTO
+    vBillToID, vGuestID, vReservationID, vEventID, vRoomType, vAnticipatedCheckOut, pNewRate
+    FROM STAYINFOVW WHERE STAYID=pOldStayID;
+    
+    CALL InsertStaySp(vBillToID, vGuestID, vReservationID, vEventID, pNewRoom, vRoomType, vAnticipatedCheckOut, pNewRate, 0);
+	SELECT LAST_INSERT_ID() into vNewStayID;
+   
+   
+   
+    #move charges from last room to this room BILLTO first and then GUEST --do not include today's room charge as it would be duplicated
+    SELECT SUM(AMOUNT) INTO vBALANCE FROM STAY_CHARGES WHERE StayID=pOldStayID and ChargeTo=vBillToID and not(ChargeType=vRoomCharges and ChargeDate=CURDATE());
+    IF IFNULL(vBALANCE,0)<>0 THEN
+    INSERT INTO STAY_CHARGES(STAYID, ChargeTo, ChargeType, Amount, ChargeDate, DueDate) 
+        values (vNewStayId, vBillToID, vBalanceTransfer,vBALANCE, CURDATE(), vAnticipatedCheckOut);
+	END IF;
+
+	#CREDIT THE ENTIRE BALANCE OF THE ROOM FOR THE BILLTO
+ SELECT SUM(AMOUNT) INTO vBALANCE FROM STAY_CHARGES WHERE StayID=pOldStayID and ChargeTo=vBillToID ;
+    IF IFNULL(vBALANCE,0)<>0 THEN
+    INSERT INTO STAY_CHARGES(STAYID, ChargeTo, ChargeType, Amount, ChargeDate, DueDate, PaidDate) 
+        values (pOldStayId, vBillToID, vBalanceTransfer,-1*vBALANCE, CURDATE(), vAnticipatedCheckOut, NOW());
+	END IF;
+ 
+	#Move the balance of the Guest
+ SELECT SUM(AMOUNT) INTO vBALANCE FROM STAY_CHARGES WHERE StayID=pOldStayID and ChargeTo=vGuestID ;
+    IF IFNULL(vBALANCE,0)<>0 THEN
+    begin
+    #create new
+    INSERT INTO STAY_CHARGES(STAYID, ChargeTo, ChargeType, Amount, ChargeDate, DueDate) 
+        values (vNewStayId, vGuestID, vBalanceTransfer,-vBALANCE, CURDATE(), vAnticipatedCheckOut);
+	#close out old
+	 INSERT INTO STAY_CHARGES(STAYID, ChargeTo, ChargeType, Amount, ChargeDate, DueDate, PaidDate) 
+        values (pOldStayId, vGuestID, vBalanceTransfer,-1*vBALANCE, CURDATE(), vAnticipatedCheckOut, NOW());
+	end;
+	END IF;
+ 
+	CALL CHECKOUTSP(pOldStayID);
+	CALL CalStayBalanceSp(pOldStayId, vGuestID);
+    CALL CalStayBalanceSp(pOldStayId, vBillToID);
+ 
+ 
+END;$$
+
+
+/*************************************************************************************************************************************/
+
+DROP PROCEDURE IF EXISTS `UpdateMaintTicketSp`; $$
+
+CREATE PROCEDURE `UpdateMaintTicketSp` (
+pMaintTicketID  INT
+, pMaintenaceDate	DATETIME
+, pEMPLOYEEID	INT
+, pNOTES		VARCHAR(255)
+, pCloseTicket	INT)
+COMMENT 'simple procedure that adds logs and can close a maintenance ticket (close ticket=1'
+BEGIN
+	INSERT INTO MAINTENANCE_LOG (MaintTicketID, MaintenanceDate, EmployeeID, Notes) Values(pMaintTicketID, pMaintenanceDate, pEmployeeID, pNotes);
+    
+    if pCloseTicket = 1 then
+		UPDATE MAINTENANCE_TICKET SET EndDAte = pMaintenanceDate where MaintTicketID=pMaintTicketID and pMaintenanceDate>StartDate;
+	end if;
+END;$$
 
 
 /***************************************************************************************************************************************************************

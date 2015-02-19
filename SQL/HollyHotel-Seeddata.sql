@@ -46,6 +46,22 @@ INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'ProximityID'
 INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'ProximityID', 'Near', 1);
 INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'ProximityID', 'Adjacent', 2);
 
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'ChargeType', 'Room Charges', 0);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'ChargeType', 'Balance Transfer', 0);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'ChargeType', 'Deposit', 0);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'ChargeType', 'Payment', 0);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'ChargeType', 'Phone', 0);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'ChargeType', 'Food', 0);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'ChargeType', 'Merchandise', 0);
+
+
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'MaintenanceType', 'Cleaning', 0);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'MaintenanceType', 'Remodel', 0);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'MaintenanceType', 'Repair', 0);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'MaintenanceType', 'Crime Scene', 0);
+INSERT INTO `TYPE_NAME` ( `UsageID`, `Name`, `UsageRank`) VALUES ( 'MaintenanceType', 'Miscellaneous', 0);
+
+
 INSERT INTO BUILDING_WING(BuildingID, WingID, NumberOfFloors) (
 select t1.TypeNameID, t2.TypeNameID
 , case t1.Name When 'Main Building' then 4
