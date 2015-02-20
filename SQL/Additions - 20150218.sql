@@ -306,8 +306,9 @@ DECLARE vROOMID INT;
 
 END;$$
 
-*************************************************************************************************************************************/
+/*************************************************************************************************************************************/
 
+/********************************************************************************************/
 DROP PROCEDURE IF EXISTS `ReassignRoomSp`; $$
 
 CREATE PROCEDURE `ReassignRoomSp` (
@@ -321,8 +322,13 @@ DECLARE vBillToID, vGuestID, vReservationID, vEventID, vRoomType, vNewStayID, vR
 DECLARE vAnticipatedCheckOut DATETIME;
 DECLARE vBALANCE, vDeposit DEC(12,2) default 0;
 
+DECLARE CONTINUE HANDLER FOR SQLEXCEPTION ROLLBACK;
+DECLARE CONTINUE HANDLER FOR SQLWARNING ROLLBACK;
+
 SELECT TypeNameID into vRoomCharges from Type_Name where UsageID = 'ChargeType' and Name = 'Room Charges';
 SELECT TypeNameID into vBalanceTransfer from Type_Name where UsageID = 'ChargeType' and Name = 'Balance Transfer';
+
+START TRANSACTION;
 
 
 # First set up a new stay with the new room, deposit is zero as we will copy those over
@@ -361,13 +367,15 @@ SELECT TypeNameID into vBalanceTransfer from Type_Name where UsageID = 'ChargeTy
         values (pOldStayId, vGuestID, vBalanceTransfer,-1*vBALANCE, CURDATE(), vAnticipatedCheckOut, NOW());
 	end;
 	END IF;
- 
+ COMMIT;
 	CALL CHECKOUTSP(pOldStayID);
 	CALL CalStayBalanceSp(pOldStayId, vGuestID);
     CALL CalStayBalanceSp(pOldStayId, vBillToID);
  
  
 END;$$
+
+/*********************************************************************************************************/
 
 
 
