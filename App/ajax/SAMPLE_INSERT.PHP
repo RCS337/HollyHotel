@@ -1,7 +1,7 @@
 <?php
 /* =====================================================================
  * TEMPLATE FOR BUILDING INSERT / UPDATE QUERIES
- * MOCK DATA BEING PASSED: {firstname: "John", lastname: "Smith", dob: 1980-03-23}
+ * MOCK DATA BEING PASSED: {firstname: "", lastname: "Smith", dob: 1980-03-23}
  ====================================================================== */
     try {
         //connect to db
