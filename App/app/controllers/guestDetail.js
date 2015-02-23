@@ -25,6 +25,7 @@ angular.module('ProtoApp')
         };
         $scope.getGuestDetails = function(){
             $http.post('../ajax/searchGuests.php', $scope.guestID) .success(function(res) {
+                console.log(res)
                 $scope.searchResults = res;
                 $scope.searchItems = $scope.searchResults.length;
                 $scope.searchLimit = 8;
