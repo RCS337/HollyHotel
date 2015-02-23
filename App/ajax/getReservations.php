@@ -6,7 +6,6 @@ try {
     $data = file_get_contents("php://input");
     $input = json_decode($data);
 
-    echo($input->StartRange . " " . $input->EndRange);
     // Construct query
     $query = $db->prepare("SELECT ReservationID, ParentResID, BillToID, BillToFirstName, BillToLastName, GuestID, GuestFirstName, GuestLastName, EventID, EventName, HostID, HostFirstName, HostLastName, RoomType, RoomTypeName, StartDate, EndDate, Rate, Deposit, Smoking, ConvertedToStay, Features, Feature_Description FROM reservationinfovw WHERE StartDate BETWEEN :StartRange AND :EndRange");
     
@@ -16,7 +15,7 @@ try {
     $query->execute();
 
     $response = array();
-    foreach ( $db->query( $query ) as $row ) {
+    foreach ($query->fetchAll(PDO::FETCH_ASSOC) as $row) {
         $response[] = $row;
     }
     // JSON-encode the response
