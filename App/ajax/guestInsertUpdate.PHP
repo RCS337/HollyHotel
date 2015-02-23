@@ -1,7 +1,6 @@
 <?php
 /* =====================================================================
- * TEMPLATE FOR BUILDING INSERT / UPDATE QUERIES
- * MOCK DATA BEING PASSED: {FirstName: "John", LastName: "Smith", dob: 1980-03-23}
+ * creates a new guest, or if the CustomerID is passed, it will update the customer record
  ====================================================================== */
     try {
         //connect to db

@@ -3,7 +3,8 @@
 try {
     require('ajax_config.php');
     // Construct query
-    $query="SELECT MaintTicketID, RoomID, RoomNumber, StartDate, AnticipatedEndDate, MaintenanceType, MaintTypeDesc, TaskDescription FROM openmaintticketsvw";
+    //$query="SELECT id, firstname, middleinit, lastname, streetaddress, city, state, zip, phone, dob FROM customers";
+    $query="SELECT * FROM stayinfovw";
     // Execute query and place results into an associative array
     $response = array();
     foreach ( $db->query( $query ) as $row ) {

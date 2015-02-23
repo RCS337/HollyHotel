@@ -25,7 +25,7 @@ if(isset($_REQUEST['username'], $_REQUEST['password'])) {
         $password = sha1($password);
         // connect to user database
         $dbuser   = "root";
-        $dbpass   = "root";
+        $dbpass   = "1234";
         $dbname   = "hollyhotel";
         $dsn      = "mysql:host=127.0.0.1;dbname=$dbname";
         $db = new PDO($dsn, $dbuser, $dbpass);
