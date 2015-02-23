@@ -24,11 +24,12 @@ if(isset($_REQUEST['username'], $_REQUEST['password'])) {
         // encrypt the password
         $password = sha1($password);
         // connect to user database
-        $dbuser   = "root";
-        $dbpass   = "1234";
-        $dbname   = "hollyhotel";
-        $dsn      = "mysql:host=127.0.0.1;dbname=$dbname";
-        $db = new PDO($dsn, $dbuser, $dbpass);
+        // $dbuser   = "root";
+        // $dbpass   = "1234";
+        // $dbname   = "hollyhotel";
+        // $dsn      = "mysql:host=127.0.0.1;dbname=$dbname";
+        // $db = new PDO($dsn, $dbuser, $dbpass);
+        include('ajax/ajax_config.php');
         try {
             $stmt = $db->prepare("SELECT userID, username, password FROM users WHERE username = :username AND password = :password");
             $stmt->bindParam(':username', $username, PDO::PARAM_STR);

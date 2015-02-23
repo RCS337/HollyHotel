@@ -1,9 +1,17 @@
 angular.module('ProtoApp')
-    .controller('MainController', function ($rootScope, $route, $routeParams, $location) {
+    .controller('MainController', function ($rootScope, $scope, $route, $routeParams, $location) {
         $rootScope.title = $route.current.title;
         $rootScope.go = function ( path ) {
             $location.path( path );
         };
+        $rootScope.getToday = function () {
+            var tDate = new Date();
+            var year = tDate.getFullYear().toString();
+            var month = (tDate.getMonth()+1).toString();
+            var day = tDate.getDate().toString();
+            $rootScope.today = year + "-" + month + "-" + day;
+        };
+        $rootScope.getToday();
     })
     .controller('DashboardCtrl', function ($scope) {
         $scope.title = "DashBoard Control";
@@ -38,6 +46,7 @@ angular.module('ProtoApp')
                 console.log(err);
             })
         };
+
         $scope.getDetails = function(){
             $http.post('../ajax/guestDetails.php', { CustomerID: $scope.guest }).success(function(res) {
                 $scope.guestDetails = res;
@@ -59,50 +68,6 @@ angular.module('ProtoApp')
                 $scope.searchResults = res;
                 $scope.searchItems = $scope.searchResults.length;
                 $scope.searchLimit = 8;
-            })
-        };
-        // On filter, set filteredItems length after a 10 millisecond delay
-        $scope.filter = function () {
-            $timeout( function () {
-                $scope.filteredItems = $scope.filtered.length;
-            }, 10);
-        };
-        // Sort items
-        $scope.sort = function(predicate) {
-            $scope.predicate = predicate;
-            $scope.reverse = !$scope.reverse;
-        };
-        $scope.setPage = function (pageNo) {
-            $scope.currentPage = pageNo;
-            console.log(pageNo);
-        };
-         // Run initializing function
-        $scope.init();
-    })
-    .controller('CheckInCtrl', function ($scope, $http, $timeout, $routeParams) {
-        $scope.init = function () {
-            // Get Available Rooms
-            $scope.getRooms();
-            // Check for guest details
-            if($routeParams.guestID) {
-                $scope.guest = $routeParams.guestID;
-                $scope.getGuestDetails();
-            }
-            // Set default max number of entries to show per page
-            $scope.entryLimit = 5;
-            // Set max number of pages to show in pagination
-            $scope.maxSize = 10;
-            // Set default current page for pagination
-            $scope.currentPage = 1;
-        };
-        $scope.getRooms = function(){
-                $http.post('../ajax/getAvailableRooms.php').success(function(res) {
-                $scope.rooms = res;
-            })
-        };
-        $scope.getGuestDetails = function(){
-            $http.post('../ajax/guestDetails.php', { CustomerID: $scope.guest }).success(function(res) {
-                $scope.guestDetails = res;
             })
         };
         // On filter, set filteredItems length after a 10 millisecond delay

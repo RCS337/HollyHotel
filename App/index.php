@@ -21,6 +21,7 @@
     <link href="../css/protoapp.css" rel="stylesheet">
 </head>
 <body>
+{{ today }}
 
 <?php include('navigation.php'); ?>
 
@@ -36,6 +37,7 @@
 <script src="../app/filters.js"></script>
 <script src="../app/factories.js"></script>
 <script src="../app/controllers.js"></script>
+<script src="../app/controllerSandbox.js"></script>
 <script src="../js/bootstrap/bootstrap.js"></script>
 </body>
 </html>
