@@ -23,6 +23,7 @@
 <body>
 {{ today }}
 
+<div ng-controller="SandboxController"></div>
 <?php include('navigation.php'); ?>
 
 <div id="page-wrapper" class="container-fluid" ng-view></div>
