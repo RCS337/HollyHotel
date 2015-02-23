@@ -39,6 +39,7 @@
 <script src="../app/factories.js"></script>
 <script src="../app/controllers.js"></script>
 <script src="../app/controllerSandbox.js"></script>
+<script src="../app/sandbox.js"></script>
 <script src="../js/bootstrap/bootstrap.js"></script>
 </body>
 </html>

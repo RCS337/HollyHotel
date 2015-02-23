@@ -9,6 +9,10 @@ angular.module('ProtoApp', ['ngRoute', 'ui.bootstrap'])
                 controller: 'MainController',
                 templateUrl: 'views/dashboard.html'
             })
+            .when('/sandbox', {
+                controller: 'SandboxController',
+                templateUrl: 'views/sandbox.html'
+            })
             .when('/reservations', {
                 controller: 'MainController',
                 templateUrl: 'views/reservations.html'

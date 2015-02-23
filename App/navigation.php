@@ -223,7 +223,7 @@
         <div class="sidebar-nav navbar-collapse">
             <ul class="nav" id="side-menu">
                 <!-- Dashboard: Single -->
-                <li><a href="/dashboard"><i class="fa fa-dashboard fa-fw"></i>&nbsp;Dashboard</a></li>
+                <li><a href="/sandbox"><i class="fa fa-dashboard fa-fw"></i>&nbsp;Dashboard</a></li>
                 <!-- Check In: Single -->
                 <li><a href="/checkin"><i class="fa fa-check fa-fw"></i>&nbsp;Check In</a></li>
                 <!-- Check Out: Single -->
