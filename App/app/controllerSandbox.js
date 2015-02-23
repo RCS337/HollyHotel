@@ -1,9 +1,14 @@
 angular.module('ProtoApp')
 	.controller('CheckInController', function ($rootScope, $scope, $http, $timeout, $routeParams, GuestListFactory) {
+       
         $scope.init = function () {
             // Get Guest List
             $scope.today = $rootScope.today;
-            $scope.getReservations();
+            $scope.reservation = {reservationID: 23, reservationStartDate: "2015-02-12"};
+            $scope.availableRooms = [{roomNumber: 2201, Beds: "2 Queen", Capacity: 4, Smoking: "Non", Floor: 3, Wing: "North", Building: "Savanah", Features: "Outdoor Pool, Handicap Access"}, {roomNumber: 2201, Beds: "2 Queen", Capacity: 4, Smoking: "Non", Floor: 3, Wing: "North", Building: "Savanah", Features: "Outdoor Pool, Handicap Access"}];
+            // $scope.filteredItems = $scope.availableRooms.length;
+            // $scope.totalItems = $scope.availableRooms.length;
+
             // Check for guest details
             // if($routeParams.guestID) {
             //     $scope.guest = $routeParams.guestID;
@@ -26,6 +31,8 @@ angular.module('ProtoApp')
             $scope.maxSize = 10;
             // Set default current page for pagination
             $scope.currentPage = 1;
+            
+            console.log($scope.reservation);
 
         };
 

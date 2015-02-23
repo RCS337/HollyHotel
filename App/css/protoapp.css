@@ -26,7 +26,18 @@ body {
         border-left: 1px solid #e7e7e7;
     }
 }
-
+.pointer:hover, .pointer:focus {
+    cursor: pointer;
+}
+.clear-group {
+    margin-top: 15px;
+}
+.left-gutter {
+    margin-left: 15px;
+}
+.right-gutter {
+    margin-right: 15px;
+}
 .navbar-top-links {
     margin-right: 0;
 }
@@ -411,6 +422,3 @@ th a, th a:link{
   .table-responsive > .table-bordered > tfoot > tr:last-child > td {
     border-bottom: 0;
   }
-.form-control {
-    margin-bottom: 1em;
-}

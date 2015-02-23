@@ -17,52 +17,28 @@ angular.module('ProtoApp')
         $scope.title = "DashBoard Control";
         $scope.message = "Dashboard Message";
     })
-    .controller('GuestsController', function ($scope, $http, $timeout, $routeParams, GuestListFactory) {
+    .controller('GuestsController', function ($rootScope, $scope, $http, $timeout, $route, $routeParams, GuestListFactory) {
+        // Set page title
+        $rootScope.title = $route.current.title;
+
         $scope.init = function () {
-            // Get Guest List
-            $scope.getAll();
             // Check for guest details
-            if($routeParams.guestID) {
-                $scope.guest = $routeParams.guestID;
-                $scope.getDetails();
+            if($routeParams.guestID){
+                $http.post('../ajax/guestDetails.php', { CustomerID: $routeParams.guestID }).success(function(res) {
+                    $scope.guest = res;
+                });
             }
+            // Sample Data {customerID: "123", FirstName: "David", LastName: "Moore", contactInfoConfidential: 0, BillToAddress1: "123 RoadName Rd", BillToAddress2: null, BillToAddress3: null, BillToAddress4: null, BillToCity: "Madison" , BillToState: "WI", BillToZip: "53716", BillToCountry: "USA", BillToPhone: "6085556666"};
+            $scope.billing = {billingID: "123", name: "David Moore", cardType: "Visa", BillToAddress1: "123 RoadName Rd", BillToAddress2: null, BillToAddress3: null, BillToAddress4: null, BillToCity: "Madison" , BillToState: "WI", BillToZip: "53716", BillToCountry: "USA"};
+            
             // Set default max number of entries to show per page
-            $scope.entryLimit = 5;
+            $scope.entryLimit = 10;
             // Set max number of pages to show in pagination
             $scope.maxSize = 10;
             // Set default current page for pagination
             $scope.currentPage = 1;
         };
-        $scope.getAll = function (){
-            GuestListFactory.getAll().then(function(res) {
-                // Success - Assign data to list
-                $scope.list = GuestListFactory.guestList;
-                // Set filtered items to default of all items
-                $scope.filteredItems = $scope.list.length;
-                // Set length of all items
-                $scope.totalItems = $scope.list.length;
-            }, function(err) {
-                // error - log to console
-                console.log(err);
-            })
-        };
 
-        $scope.getDetails = function(){
-            $http.post('../ajax/guestDetails.php', { CustomerID: $scope.guest }).success(function(res) {
-                $scope.guestDetails = res;
-            })
-        };
-        $scope.getSingle = function () {
-            // $scope.guestID = $routeParams.guestID;
-            // console.log($scope.guestID);
-            GuestListFactory.getSingle($scope.guestID).then(function(res){
-                // Success - Assign data to detail
-                $scope.details = GuestListFactory.guestList;
-            }, function(err){
-                //error - log to console
-                console.log(err);
-            })
-        }; // end getSingle
         $scope.searchGuests = function () {
             $http.post('../ajax/searchGuests.php', $scope.formData) .success(function(res) {
                 $scope.searchResults = res;
@@ -70,17 +46,21 @@ angular.module('ProtoApp')
                 $scope.searchLimit = 8;
             })
         };
+
         // On filter, set filteredItems length after a 10 millisecond delay
         $scope.filter = function () {
             $timeout( function () {
                 $scope.filteredItems = $scope.filtered.length;
             }, 10);
         };
+
         // Sort items
         $scope.sort = function(predicate) {
             $scope.predicate = predicate;
             $scope.reverse = !$scope.reverse;
         };
+
+        // Set page number
         $scope.setPage = function (pageNo) {
             $scope.currentPage = pageNo;
             console.log(pageNo);

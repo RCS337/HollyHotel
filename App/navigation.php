@@ -255,7 +255,8 @@
                 <!-- Guests Drop Down-->
                 <li class="dropdown"><a href="#"><i class="fa fa-users fa-fw"></i>&nbsp;Guests<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
-                        <li><a href="/guests">View All</a></li>
+                        <li><a href="/guests">Search</a></li>
+                        <li><a href="/guests/new">Add New Guest</a></li>
                         <li><a href="/guests/current">Checked In</a></li>
                     </ul>
                 </li>

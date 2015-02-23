@@ -1,11 +1,12 @@
-<h1>{{guest.FirstName}} {{guest.LastName}}</h1>
+<h1>Add New Guest</h1>
 <hr>
 <!-- Guest Info Panel -->
 <div class="panel panel-default">
     <!-- Panel Heading -->
     <div class="panel-heading"><h3 class="panel-title">Guest Details</h3></div>
     <div class="panel-body">
-    	<form>
+    	<form class="clearfix">
+        <legend>Personal Information</legend>
             <div class="col-xs-6 form-group">
             <label for="firstname">First Name: </label>
                 <input type="text" name="firstName" placeholder="First Name" class="form-control" ng-model="guest.FirstName"/>
@@ -14,11 +15,11 @@
                 <label for="firstname">Last Name: </label>
                 <input type="text" name="lastName" placeholder="Last Name" class="form-control" ng-model="guest.LastName"/>
             </div>
-            <div class="col-lg-12 form-group">
+            <div class="col-xs-12 form-group">
                 <label for="address1">Street Address: </label>
                 <input type="text" name="address1" placeholder="Street Address, Line 1" class="form-control" ng-model="guest.BillToAddress1"/>
             </div>
-            <div class="col-lg-12 form-group">
+            <div class="col-xs-12 form-group">
             	<input type="text" name="address2" placeholder="Street Address, Line 2" class="form-control" ng-model="guest.BillToAddress2"/>
             </div>
             <div class="col-xs-12 col-sm-3 form-group">
@@ -41,23 +42,10 @@
                 <label for="phone">Phone: </label>
                 <input type="text" name="phone" placeholder="Phone" class="form-control" ng-model="guest.BillToPhone"/>
             </div>
-			<!--<div class="col-md-6">
-                <label for="email">Email: </label>
-                <input type="text" name="email" placeholder="email" class="form-control"ng-model="guest.LastName" />
-            </div> -->
-            <div class="col-xs-12 form-group clear-group">
-            	<button type="button" class="btn btn-primary" name="update" ng-click="update()">Update Guest Information</button>
-                <a class="btn btn-primary gutter-left"href="checkin/{{guest.CustomerID}}">Check-In</a>
-            </div>
         </form>
-    </div><!-- /.panel-body -->
-</div><!-- /.panel -->
-<!-- Guest Billing Info Panel -->
-<div class="panel panel-default">
-    <!-- Panel Heading -->
-    <div class="panel-heading"><h3 class="panel-title">Payment Details</h3></div>
-    <div class="panel-body">
+
         <form class="clear-group clearfix">
+            <legend>Payment Information</legend>
             <div class="col-xs-12 form-group">
             <label for="firstname">Name on Card: </label>
                 <input type="text" name="cardName" placeholder="Name on Card" class="form-control"/>
@@ -98,10 +86,12 @@
                 <label for="country">Country: </label>
                 <input type="text" name="country" placeholder="Country" class="form-control"/>
             </div>
-            <div class="col-xs-12 form-group clear-group">
-                <button type="button" class="pull-left btn btn-primary right-gutter" name="update" ng-click="update()">Update Card</button>
-                <button type="button" class="pull-left btn btn-danger right-gutter" name="update" ng-click="update()">Delete Card</button>
-            </div>
         </form>
+
+        <div class="col-xs-12 form-group clear-group">
+            <button type="button" class="pull-left btn btn-primary" name="update" ng-click="add()">Submit</button>
+            <button type="button" class="pull-right btn btn-success" name="update" ng-click="addCheckIn()">Check In</button>
+        </div>
+
     </div><!-- /.panel-body -->
 </div><!-- /.panel -->

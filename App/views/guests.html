@@ -1,8 +1,43 @@
-<h1>Guest Overview</h1>
+<!-- Guest Search -->
+<h1>Search Guests</h1>
+<hr>
 <div class="panel panel-default">
     <!-- Panel Heading -->
-    <div class="panel-heading">Panel</div>
+    <div class="panel-heading"><h3 class="panel-title">Guest Search</h3></div>
     <!-- Panel Body -->
     <div class="panel-body">
-    </div><!-- /.panel-body -->
-</div><!-- /.panel -->
+        <!-- Search for existing guest -->
+        <form class="clearfix">
+            <div class="col-xs-12 col-sm-5 form-group">
+                <input type="text" name="FirstName" ng-model="formData.FirstName" placeholder="First Name" class="form-control" />
+            </div>
+            <div class="col-xs-12 col-sm-5 form-group">
+                <input type="text" name="LastName" ng-model="formData.LastName" placeholder="Last Name" class="form-control" />
+            </div>
+            <div class="col-sm-2 form-group">
+                <button type="button" class="btn btn-primary pull-right" name="update" ng-click="searchGuests()">Search</button>
+            </div>
+        </form>
+        <!-- Display Search Results -->
+        <table class="table table-striped table-bordered table-hover table-responsive clear-group" ng-show="searchItems > 0">
+            <thead>
+                <tr>
+                    <th ng-click='sort("CustomerID")' class="pointer">ID &nbsp;<i class="fa fa-arrows-v"></i></th>
+                    <th ng-click='sort("FirstName")' class="pointer">First Name &nbsp;<i class="fa fa-arrows-v"></i></th>
+                    <th ng-click='sort("LastName")' class="pointer">Last Name &nbsp;<i class="fa fa-arrows-v"></i></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="data in filtered = (searchResults | filter:search | orderBy : predicate :reverse) | startFrom:(currentPage-1)*searchLimit | limitTo:searchLimit">
+                    <td ng-click="go('/guests/' + data.CustomerID)">{{data.CustomerID}}</a></td>
+                    <td ng-click="go('/guests/' + data.CustomerID)">{{data.FirstName}}</td>
+                    <td ng-click="go('/guests/' + data.CustomerID)">{{data.LastName}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- Pagination -->
+        <div ng-show="searchItems > searchLimit">
+            <pagination ng-model="currentPage" max-size="maxSize" total-items="searchItems" items-per-page="searchLimit" boundary-links="false" rotate="false"></pagination>
+        </div>
+    </div>
+</div>

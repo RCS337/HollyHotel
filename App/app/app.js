@@ -30,7 +30,7 @@ angular.module('ProtoApp', ['ngRoute', 'ui.bootstrap'])
                 templateUrl: 'views/checkin.html'
             })
             .when('/checkin/:guestID/', {
-                controller: 'MainController',
+                controller: 'CheckInController',
                 templateUrl: 'views/checkinGuest.html'
             })
             .when('/checkout', {
@@ -42,12 +42,17 @@ angular.module('ProtoApp', ['ngRoute', 'ui.bootstrap'])
                 templateUrl: 'views/maintenance.html'
             })
             .when('/guests', {
-                controller: 'MainController',
+                controller: 'GuestsController',
                 templateUrl: 'views/guests.html',
                 title: 'Guests'
             })
+            .when('/guests/new', {
+                controller: 'GuestsController',
+                templateUrl: 'views/newGuest.html',
+                title: 'New Guests'
+            })
             .when('/guests/:guestID', {
-                controller: 'MainController',
+                controller: 'GuestsController',
                 templateUrl: 'views/guestDetails.html',
                 title: 'Guests Details'
             })
