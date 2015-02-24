@@ -1,0 +1,54 @@
+html { 
+  background: transparent url(images/hotel-bg.jpg) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  height: 100%;
+}
+body {
+	background: transparent;
+	height: 100%;
+	color: #666666;
+}
+#page-wrapper {
+	background: transparent;
+}
+div.login-form {
+	background: rgba(0,0,0, 0.7);
+	padding: 2em;
+	border-radius: 4px;
+
+}
+form {
+	width: 100%;
+}
+div#align {
+	height: 100%;
+	display: flex;
+  	align-items: center;
+  	justify-content: center;
+  	width: 90%;
+	max-width: 500px;
+	margin: 0 auto;
+
+}
+.btn {
+	width: 100%;
+	font-size: 2em;
+	padding: .5em;
+}
+p.error {
+	color: red;
+	font-size: 1.5em;
+}
+input.form-control {
+	padding: 1.5em;
+	font-size: 1.5em;
+}
+h1 {
+	font-size: 3em;
+	color: #d3d3d3;
+	margin: 0;
+	padding: 0;
+}

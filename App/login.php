@@ -60,26 +60,34 @@ if(isset($_REQUEST['username'], $_REQUEST['password'])) {
     <!-- Bootstrap Core CSS -->
     <link href="../css/bootstrap.css" rel="stylesheet">
     <link href="../css/font-awesome/css/font-awesome.css" rel="stylesheet">
-    <link href="../css/protoapp.css" rel="stylesheet">
+    <link href="../css/login.css" rel="stylesheet">
 </head>
 <body>
 
-<div id="page-wrapper" class="container-fluid">
- <h1>Login</h1>
+<div id="align">
+<div class="login-form">
+<div class="col-xs-12 form-group">
+ <h1>Holly Hotel Login</h1>
+ </div>
     <form action="login.php" method="post">
+    <div class="col-lg-12 form-group">
+        <p class="error"><?php if(isset($error_message)) {echo $error_message;} ?></p>
+    </div>
+    <div class="col-lg-12 form-group">
+        <input class="form-control" type="text" id="username" name="username" value="" maxlength="20" placeholder="Username" required/>
+        <p class="error"><?php if(isset($uError)) {echo $uError;} ?></p>
+    </div>
+    <div class="col-lg-12 form-group">
+        <input class="form-control" type="password" id="password" name="password" value="" maxlength="20" placeholder="Password" required/>
+        <p class="error"><?php if(isset($pError)) {echo $pError;} ?></p>
+    </div>
 
-    <?php if(isset($error_message)) {echo $error_message;} ?>
-    <label for="username">Username</label>
-    <input type="text" id="username" name="username" value="" maxlength="20" placeholder="Username" required/>
-    <?php if(isset($uError)) {echo $uError;} ?>
-
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password" value="" maxlength="20" placeholder="Password" required/>
-    <?php if(isset($pError)) {echo $pError;} ?>
-
-    <input type="submit" value="Login" />
+    <div class="col-lg-12 form-group">
+        <input class="btn btn-primary pull-right" type="submit" value="Login" />
+    </div>    
 
     </form>
+</div>
 </div>
 
 <!-- All of our JavaScript files -->
