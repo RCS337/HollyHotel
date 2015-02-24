@@ -1,15 +1,30 @@
 delimiter $$
 
-DROP VIEW IF EXISTS ResFeaturesVw $$
-
-CREATE VIEW ResFeaturesVw AS
-select ReservationID, BedFeatureID as Bed_FeatureID, ProximityID, count(ReservationID) as Qty from res_features group by ReservationID, BedFeatureID, ProximityID
-Union
-select 
-r.RoomID, bwf.FeatureID as Bed_FeatureID, bwf.ProximityID, 1 as Qty
-from room r
-join BUILDING_WING_FEATURES bwf on bwf.BuildingID=r.BuildingID and bwf.WingID=r.WingID ;
-
 $$
 
 delimiter ;
+
+DROP TABLE IF EXISTS `CC_INFO`;
+
+CREATE TABLE IF NOT EXISTS `CC_INFO` (
+  `CCID` INT NOT NULL AUTO_INCREMENT COMMENT 'Surrogate Key',
+  `CustomerID` INT NOT NULL COMMENT 'Links Customer to the Credit Card',
+  `AddressSeq` INT NOT NULL COMMENT 'Links Credit Card to billing address.  If the same as the primary then 0, otherwise add new sequence',
+  `NameOnCard` VARCHAR(100) NULL,
+  `CCNumber` VARCHAR(16) NOT NULL COMMENT 'Credit card Number, Normally12 digits',
+  `ExpMonth` INT NULL COMMENT 'Expiration Month 1-12',
+  `ExpYear` INT NULL COMMENT 'Expiration Year',
+  PRIMARY KEY (`CCID`),
+  INDEX `CC_INFO_CustAddrSeq_FK_idx` (`CustomerID` ASC, `AddressSeq` ASC),
+  CONSTRAINT `CC_INFO_CustAddrSeq_FK`
+    FOREIGN KEY (`CustomerID` , `AddressSeq`)
+    REFERENCES `hollyhotel`.`ADDRESS` (`CustomerID` , `AddressSeq`)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
+  CONSTRAINT `CC_INFO_CustomerID`
+    FOREIGN KEY (`CustomerID`)
+    REFERENCES `hollyhotel`.`CUSTOMER` (`CustomerID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+COMMENT = 'Holds Credit Card Information (would not exist in this manne' /* comment truncated */ /*r in real life)*/
