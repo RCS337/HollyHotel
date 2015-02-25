@@ -14,15 +14,16 @@ body {
 #page-wrapper {
 	background: transparent;
 }
-div.login-form {
+div#login-form {
+	display: none;
 	background: rgba(0,0,0, 0.7);
 	padding: 2em;
 	border-radius: 4px;
-
 }
 form {
 	width: 100%;
 }
+
 div#align {
 	height: 100%;
 	display: flex;
@@ -47,6 +48,9 @@ input.form-control {
 	font-size: 1.5em;
 }
 h1 {
+	font-family: 'Lobster', cursive;
+	letter-spacing: +2px;
+    text-align: center;
 	font-size: 3em;
 	color: #d3d3d3;
 	margin: 0;

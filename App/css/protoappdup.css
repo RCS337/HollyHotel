@@ -3,56 +3,51 @@
  * Code licensed under the Apache License v2.0.
  * For details, see http://www.apache.org/licenses/LICENSE-2.0.
  */
-
+@import url(http://fonts.googleapis.com/css?family=Lobster);
 body {
-    /*background-color: #000000;*/
-    background: url(images/hotel-bg.jpg) no-repeat center center fixed; 
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
-    height: 100%;
+  background: url(images/hotel-bg.jpg) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  height: 100%;
+}
+.cursive {
+    font-family: 'Lobster', cursive;
+}
+.navbar-brand {
+    font-size: 24px;
+    letter-spacing: +2px;
+    text-align: right;
+}
+
+#navigation, #sidebar, #visible{
+    display: none;
+}
+#navigation {
+    width: 100%;
+    background: #3C8DBC;
+}
+#navigation a, #navigation a:link {
+    color: #fff;
 }
 
 #wrapper {
     width: 100%;
 }
+
 #page-wrapper {
     padding: 1em;
     min-height: 100vh;
+    margin-top: 50px;
     background-color: #fff;
-    margin-top: 101px;
 }
-#navigation, #sidebar, #visible{
-    display: none;
-}
-#navigation {
-    /*background: #3C8DBC;*/
-    background: #428bca;
-    border-color: #3880A8
-}
-.cursive {
-    font-family: 'Lobster', cursive;
-}
-#navigation .navbar-brand {
-    font-size: 24px;
-    letter-spacing: +2px;
-    text-align: right;
-    color: #ffffff;
-}
-#navigation .nav > li > a:hover, .nav > li > a:focus {
-    background-color: #3880A8;
-    color: #ffffff;
-}
+
 th i {
     float: right;
    position: relative;
    right: 1em;
    top: 3px;
-   color: #428bca;
-}
-.white {
-    color: #ffffff;
 }
 @media(min-width:768px) {
     #page-wrapper {
@@ -61,6 +56,9 @@ th i {
         padding: 2em;
         border-left: 1px solid #e7e7e7;
     }
+}
+.pointer {
+    color: #3C8DBC;
 }
 .pointer:hover, .pointer:focus {
     cursor: pointer;
@@ -177,12 +175,9 @@ th i {
 @media(min-width:768px) {
     .sidebar {
         z-index: 1;
-        position: fixed;
+        position: absolute;
         width: 250px;
-        height: 100vh;
-    }
-    #page-wrapper {
-        margin-top: 51px;
+        min-height: 100vh;
     }
 
     .navbar-top-links .dropdown-messages,

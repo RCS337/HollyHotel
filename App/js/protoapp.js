@@ -1,4 +1,21 @@
 $(function() {
+
+    $('#navigation').toggle(800);
+    $('#sidebar').toggle(800).promise().done(function(){
+        $('#visible').toggle(800);
+    });
+    $('#logout').on('click', function(){
+        var href = $(this).attr('href');
+        $('#visible').toggle(800).promise().done(function(){
+            $('#navigation').toggle(800);
+            $('#sidebar').toggle(800).promise().done(function(){
+                window.location = href;
+            })
+        })
+        return false;
+    });
+
+
     $( 'li.dropdown' ).each(function() {
         var self = this;
         var link = $(self).children('a')[0];
@@ -11,6 +28,7 @@ $(function() {
             return false;
         });
     });
+
 });
 
 //Loads the correct sidebar on window load,

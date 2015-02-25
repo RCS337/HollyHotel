@@ -35,11 +35,13 @@ if(isset($_REQUEST['username'], $_REQUEST['password'])) {
             $stmt->bindParam(':username', $username, PDO::PARAM_STR);
             $stmt->bindParam(':password', $password, PDO::PARAM_STR, 40);
             $stmt->execute();
-            $userID = $stmt->fetchColumn();
+            $result = $stmt->fetch();
+            $userID = $result['userID'];
             if(!$userID){
                 $error_message = "login failed";
             } else {
                 $_SESSION['user_id'] = $userID;
+                $_SESSION['user_name'] = $result['username'];
                 header( 'location: /index.php');
             }
         } catch (Exception $e){
@@ -65,24 +67,25 @@ if(isset($_REQUEST['username'], $_REQUEST['password'])) {
 <body>
 
 <div id="align">
-<div class="login-form">
+<div id="login-form">
 <div class="col-xs-12 form-group">
  <h1>Holly Hotel Login</h1>
  </div>
-    <form action="login.php" method="post">
-    <div class="col-lg-12 form-group">
-        <p class="error"><?php if(isset($error_message)) {echo $error_message;} ?></p>
+    <form action="login.php" method="post" class="clearfix">
+    <div class="col-xs-12 form-group">
+        <?php if(isset($error_message)) {echo('<p class="error">' . $error_message . '</p>');} ?>
     </div>
-    <div class="col-lg-12 form-group">
-        <input class="form-control" type="text" id="username" name="username" value="" maxlength="20" placeholder="Username" required/>
-        <p class="error"><?php if(isset($uError)) {echo $uError;} ?></p>
+    <div class="col-xs-12 form-group">
+        <input class="form-control" type="text" id="username" name="username" placeholder="Username" required/>
+        <?php if(isset($uError)) { echo('<p class="error">' . $uError . '</p>'); }?>
+
     </div>
-    <div class="col-lg-12 form-group">
-        <input class="form-control" type="password" id="password" name="password" value="" maxlength="20" placeholder="Password" required/>
-        <p class="error"><?php if(isset($pError)) {echo $pError;} ?></p>
+    <div class="col-xs-12 form-group">
+        <input class="form-control" type="password" id="password" name="password" placeholder="Password" required/>
+        <?php if(isset($pError)) {echo('<p class="error">' . $pError . '</p>');} ?>
     </div>
 
-    <div class="col-lg-12 form-group">
+    <div class="col-xs-12 form-group">
         <input class="btn btn-primary pull-right" type="submit" value="Login" />
     </div>    
 
@@ -90,7 +93,9 @@ if(isset($_REQUEST['username'], $_REQUEST['password'])) {
 </div>
 </div>
 
+
 <!-- All of our JavaScript files -->
 <script src="../js/jquery/jquery.js"></script>
+<script src="../js/login.js"></script>
 </body>
 </html>

@@ -21,13 +21,11 @@
     <link href="../css/protoapp.css" rel="stylesheet">
 </head>
 <body>
-{{ today }}
-
-<div ng-controller="SandboxController"></div>
 <?php include('navigation.php'); ?>
 
-<div id="page-wrapper" class="container-fluid" ng-view></div>
-
+<div id="visible">
+    <div id="page-wrapper" class="container-fluid" ng-view></div>
+</div>
 <!-- All of our JavaScript files -->
 <script src="../js/angular-core/angular.js"></script>
 <script src="../js/angular-route/angular-route.js"></script>
