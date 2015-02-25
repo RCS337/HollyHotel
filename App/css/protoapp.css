@@ -21,10 +21,12 @@ body {
     padding: 1em;
     min-height: 100vh;
     background-color: #fff;
-    margin-top: 101px;
 }
 #navigation, #sidebar, #visible{
     display: none;
+}
+.sidebar {
+    margin-top: 101px;
 }
 #navigation {
     /*background: #3C8DBC;*/
@@ -45,10 +47,6 @@ body {
     color: #ffffff;
 }
 th i {
-    float: right;
-   position: relative;
-   right: 1em;
-   top: 3px;
    color: #428bca;
 }
 .white {
@@ -180,6 +178,7 @@ th i {
         position: fixed;
         width: 250px;
         height: 100vh;
+        margin-top: 0;
     }
     #page-wrapper {
         margin-top: 51px;

@@ -7,7 +7,7 @@
         $data = file_get_contents("php://input");
         $input = json_decode($data);
         // prepare query
-        $query = $db->prepare("SELECT CustomerID, FirstName, LastName FROM customer WHERE CustomerID = :CustomerID");
+        $query = $db->prepare("SELECT CustomerID, FirstName, LastName, contactInfoConfidential, BillToAddress1, BillToAddress2, BillToCity, BillToState, BillToZip, BillToCountry, BillToPhoneNum FROM stdcustomerinfovw WHERE CustomerID = :CustomerID");
         $query->bindParam(':CustomerID', $input->CustomerID, PDO::PARAM_STR);
         // execute query
         $query->execute();

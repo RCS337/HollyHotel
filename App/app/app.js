@@ -2,11 +2,15 @@ angular.module('ProtoApp', ['ngRoute', 'ui.bootstrap', 'ui.date'])
     .config(function ($routeProvider, $locationProvider) {
         $routeProvider
              .when('/', {
-                controller: 'MainController',
+                controller: 'DashboardController',
+                templateUrl: 'views/dashboard.html'
+            })
+            .when('/index.php', {
+                controller: 'DashboardController',
                 templateUrl: 'views/dashboard.html'
             })
             .when('/dashboard', {
-                controller: 'MainController',
+                controller: 'DashboardController',
                 templateUrl: 'views/dashboard.html'
             })
             .when('/sandbox', {
@@ -16,6 +20,10 @@ angular.module('ProtoApp', ['ngRoute', 'ui.bootstrap', 'ui.date'])
             .when('/reservations', {
                 controller: 'MainController',
                 templateUrl: 'views/reservations.html'
+            })
+            .when('/reservations/new', {
+                controller: 'ReservationController',
+                templateUrl: 'views/reservationNew.html'
             })
             .when('/reservations/:reservationID', {
                 controller: 'MainController',

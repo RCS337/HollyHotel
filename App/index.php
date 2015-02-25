@@ -41,8 +41,11 @@
 <script src="../app/factories.js"></script>
 <script src="../app/controllers.js"></script>
 <script src="../app/controllerSandbox.js"></script>
+<script src="../app/dashboardController.js"></script>
 <script src="../app/sandbox.js"></script>
 <script src="../js/bootstrap/ui-bootstrap-tpls-0.12.0.js"></script>
 <script src="../js/bootstrap/bootstrap.js"></script>
+<!-- <script src="../live-templates.js"></script> -->
+
 </body>
 </html>

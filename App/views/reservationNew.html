@@ -154,4 +154,5 @@
    <input type="submit" class="btn btn-lg btn-success pull-right" value="Submit Reservation">
 </div>
 </form>
-
+<div class="form-group col-xs-12" ng-show="submitReservationError == true"><div class="alert alert-danger"><p>Something Went Wrong! Reservation Not Submitted</p></div></div>
+<div class="form-group col-xs-12" ng-show="submitReservationSuccess == true"><div class="alert alert-success"><p>Reservation Successfully Created</p></div></div>

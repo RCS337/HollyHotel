@@ -36,7 +36,6 @@ angular.module('ProtoApp')
             $scope.psmoking = $scope.roomForm.psmoking;
 
             $http.post('../ajax/getAvailableRooms.php', { pstartdate: $scope.pstartdate, penddate: $scope.penddate, proomtype: $scope.proomtype, psmoking: $scope.psmoking ,prequirements: null }).success(function(res) {
-                console.log(res);
                 $scope.availableRooms = res;
                 $scope.filteredItems = $scope.availableRooms.length;
             });
