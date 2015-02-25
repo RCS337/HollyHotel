@@ -8,15 +8,19 @@
         $input = json_decode($data);
         // prepare query
         $query = $db->prepare("CALL getavailableroomssp(:pstartdate, :penddate, :proomtype, :psmoking, :prequirements)");
-        $query->bindParam(':pstartdate', $input->pstartdate, PDO::PARAM_STR);
-        $query->bindParam(':penddate', $input->penddate, PDO::PARAM_STR);
-        $query->bindParam(':proomtype', $input->proomtype, PDO::PARAM_INT);
-        $query->bindParam(':psmoking', $input->psmoking, PDO::PARAM_INT);
+        $query->bindValue(':pstartdate', $input->pstartdate, PDO::PARAM_STR);
+        $query->bindValue(':penddate', $input->penddate, PDO::PARAM_STR);
+        $query->bindValue(':proomtype', $input->proomtype, PDO::PARAM_INT);
+        $query->bindValue(':psmoking', $input->psmoking, PDO::PARAM_INT);
         //if null or blank it will return all rooms, otherwise it will try to match the type of room asked for
-        $query->bindParam(':prequirements', $input->prequirements, PDO::PARAM_STR);
+        $query->bindValue(':prequirements', $input->prequirements, PDO::PARAM_STR);
         // execute query
         $query->execute();
-        $response = $query->fetch(PDO::FETCH_ASSOC);
+        $response = array();
+        $i = 0;
+        foreach ($query->fetchAll(PDO::FETCH_ASSOC) as $row) {;
+            $response[] = $row;
+        }
         // JSON-encode the response so Javascript can read it
         $json_response = json_encode( $response );
         // return the response to Angular

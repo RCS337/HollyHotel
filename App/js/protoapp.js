@@ -1,5 +1,14 @@
 $(function() {
 
+    $('#page-wrapper').on('click', '.datepicker', function(){
+        $(this).datepicker({ dateFormat: 'yy-mm-dd' });
+        $(this).datepicker('show');
+    });
+    $('body').on('click', '.datepicker', function(){
+        console.log("click");
+        $(this).datepicker({ dateFormat: 'yy-mm-dd' });
+        $(this).datepicker('show');
+    });
     $('#navigation').toggle(800);
     $('#sidebar').toggle(800).promise().done(function(){
         $('#visible').toggle(800);

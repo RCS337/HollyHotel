@@ -17,6 +17,7 @@
     <!-- Place favicon.ico in the root directory -->
     <!-- Bootstrap Core CSS -->
     <link href="../css/bootstrap.css" rel="stylesheet">
+    <link href="../css/jquery-ui.css" rel="stylesheet">
     <link href="../css/font-awesome/css/font-awesome.css" rel="stylesheet">
     <link href="../css/protoapp.css" rel="stylesheet">
 </head>
@@ -27,17 +28,21 @@
     <div id="page-wrapper" class="container-fluid" ng-view></div>
 </div>
 <!-- All of our JavaScript files -->
+
+
+<script src="../js/jquery/jquery.js"></script>
+<script src="../js/jquery/jquery-ui.js"></script>
+<script src="../js/protoapp.js"></script>
 <script src="../js/angular-core/angular.js"></script>
 <script src="../js/angular-route/angular-route.js"></script>
-<script src="../js/bootstrap/ui-bootstrap-tpls-0.12.0.js"></script>
-<script src="../js/jquery/jquery.js"></script>
-<script src="../js/protoapp.js"></script>
+<script src="../js/date.js"></script>
 <script src="../app/app.js"></script>
 <script src="../app/filters.js"></script>
 <script src="../app/factories.js"></script>
 <script src="../app/controllers.js"></script>
 <script src="../app/controllerSandbox.js"></script>
 <script src="../app/sandbox.js"></script>
+<script src="../js/bootstrap/ui-bootstrap-tpls-0.12.0.js"></script>
 <script src="../js/bootstrap/bootstrap.js"></script>
 </body>
 </html>

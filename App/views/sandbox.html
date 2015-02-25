@@ -1,1 +1,52 @@
 <h1>sandbox</h1>
+
+<div class="panel panel-default">
+    <div class="panel-heading"><h3 class="panel-title">Available Rooms</h3></div>
+    <div class="panel-body table-responsive">
+	<form action="">
+		<input class="form-control datepicker" type="text" ng-model="roomForm.pstartdate" placeholder="Start Date" ui-date ui-date-format="yy-mm-dd">
+		<input class="form-control datepicker" type="text" ng-model="roomForm.penddate" placeholder="End Date" ui-date ui-date-format="yy-mm-dd">
+		<select class="form-control" ng-model="roomForm.proomtype">
+			<option value="15">Sleeping Room</option>
+			<option value="16">Meeting Room</option>
+			<option value="17">Suite</option>
+		</select>
+		<select class="form-control" ng-model="roomForm.psmoking">
+			<option value="0">Non</option>
+			<option value="1">Smoking</option>
+		</select>
+		<div class="col-sm-2 form-group">
+                <button type="button" class="btn btn-primary pull-right" name="update" ng-click="searchRooms()">Search</button>
+         </div>
+	</form>
+
+
+
+
+    <table class="table table-striped table-bordered table-hover table-responsive clear-group">
+            <thead>
+                <tr>
+                    <th ng-click='' class="pointer">Room Number &nbsp;<i class="fa fa-arrows-v"></i></th>
+                    <th ng-click='' class="pointer">Beds &nbsp;<i class="fa fa-arrows-v"></i></th>
+                    <th ng-click='' class="pointer">Features &nbsp;<i class="fa fa-arrows-v"></i></th>
+                    <th ng-click='' class="pointer">Smoking &nbsp;<i class="fa fa-arrows-v"></i></th>
+                    <th ng-click='' class="pointer">Building &nbsp;<i class="fa fa-arrows-v"></i></th>
+                    <th ng-click='' class="pointer">Wing &nbsp;<i class="fa fa-arrows-v"></i></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="data in filtered = (availableRooms | filter:search | orderBy : predicate :reverse) | startFrom:(currentPage-1)*entryLimit | limitTo:entryLimit">
+                    <td ng-click="go('/guests/' + data.CustomerID)">{{data.RoomNumber}}</a></td>
+                    <td ng-click="go('/guests/' + data.CustomerID)">{{data.Beds}}</td>
+                    <td ng-click="go('/guests/' + data.CustomerID)">{{data.Features}}</td>
+                    <td ng-click="go('/guests/' + data.CustomerID)">{{data.SmokingAllowed}}</td>
+                    <td ng-click="go('/guests/' + data.CustomerID)">{{data.BuildingName}}</td>
+                    <td ng-click="go('/guests/' + data.CustomerID)">{{data.WingName}}</td>
+                </tr>
+            </tbody>
+        </table>
+         <div>
+            <pagination ng-model="currentPage" max-size="maxSize" total-items="filteredItems" items-per-page="entryLimit" boundary-links="false" rotate="false"></pagination>
+        </div>
+    </div>
+</div>
