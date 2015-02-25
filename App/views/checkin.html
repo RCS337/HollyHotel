@@ -1,3 +1,4 @@
+
 <h1>Check-In</h1>
 <hr>
 <!-- Todays Reservations -->
@@ -14,9 +15,18 @@
                 </tr>
             </thead>
             <tbody>
-
+                <tr ng-repeat="data in filtered = (reservations | filter:search | orderBy : predicate :reverse) | startFrom:(currentPage-1)*searchLimit | limitTo:searchLimit">
+                    <td ng-click="go('/checkin/reservation/' + data.ReservationID)">{{data.BillToFirstName}} {{data.BillToLastName}}</a></td>
+                    <td ng-click="go('/checkin/reservation/' + data.ReservationID)">{{data.GuestFirstName}} {{data.GuestLastName}}</td>
+                    <td ng-click="go('/checkin/reservation/' + data.ReservationID)">{{data.StartDate}}</td>
+                    <td ng-click="go('/checkin/reservation/' + data.ReservationID)">{{data.EndDate}}</td>
+                </tr>
             </tbody>
         </table>
+
+                <div ng-show="reservationItems > searchLimit">
+            <pagination ng-model="currentPage" max-size="maxSize" total-items="reservationItems" items-per-page="searchLimit" boundary-links="false" rotate="false"></pagination>
+        </div>
     </div>
 </div>
 

@@ -18,7 +18,7 @@ angular.module('ProtoApp', ['ngRoute', 'ui.bootstrap', 'ui.date'])
                 templateUrl: 'views/sandbox.html'
             })
             .when('/reservations', {
-                controller: 'MainController',
+                controller: 'ReservationController',
                 templateUrl: 'views/reservations.html'
             })
             .when('/reservations/new', {
@@ -41,7 +41,19 @@ angular.module('ProtoApp', ['ngRoute', 'ui.bootstrap', 'ui.date'])
                 controller: 'CheckInController',
                 templateUrl: 'views/checkin.html'
             })
-            .when('/checkin/:guestID/', {
+            .when('/checkin/reservation', {
+                controller: 'CheckInController',
+                templateUrl: 'views/checkin.html'
+            })
+            .when('/checkin/reservation/:reservationID', {
+                controller: 'CheckInController',
+                templateUrl: 'views/checkInReservation.html'
+            })
+            .when('/checkin/guest', {
+                controller: 'CheckInController',
+                templateUrl: 'views/checkin.html'
+            })
+            .when('/checkin/guest/:guestID', {
                 controller: 'CheckInController',
                 templateUrl: 'views/checkinGuest.html'
             })

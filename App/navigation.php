@@ -42,7 +42,7 @@
                     <ul class="nav nav-second-level">
                         <li><a href="/reservations">View All</a></li>
                         <li><a href="/reservations/new">New Reservation</a></li>
-                        <li><a href="/reservations/today">Today</a></li>
+                        <li><a href="/checkin/reservation">Check In</a></li>
                         <li><a href="/reservations/upcoming">Upcoming</a></li>
                     </ul>
                 </li>

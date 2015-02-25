@@ -1,8 +1,54 @@
-<h1>Reservations</h1>
 <div class="panel panel-default">
-    <!-- Panel Heading -->
-    <div class="panel-heading">Panel</div>
-    <!-- Panel Body -->
+    <div class="panel-heading">Reservations</div>
     <div class="panel-body">
-    </div><!-- /.panel-body -->
-</div><!-- /.panel -->
+
+
+        <form ng-submit="getReservations()" class="form-group">
+            <legend>Search Reservations</legend>
+            <div class="col-md-4 form-group">
+                <input class="form-control datepicker" type="text" ng-model="reservationSearch.startDate" placeholder="Check In Date" ui-date ui-date-format="yy-mm-dd" required>
+            </div>
+            <div class="col-md-4 form-group">
+                <input class="form-control datepicker" type="text" ng-model="reservationSearch.endDate" placeholder="Check Out Date" ui-date ui-date-format="yy-mm-dd" required>
+            </div>
+            <div class="col-md-4 form-group">
+                <input type="submit" value="Search" class="btn btn-primary pull-right">
+            </div>
+
+        </form>
+        <div class="table-responsive" ng-show="reservationItems > 0">
+        <form ng-submit="getReservations()">
+            <legend>Filter Results</legend>
+            <div class="col-md-12 form-group">
+                <input type="text" class="form-control" ng-model="search" placeholder="Filter">
+            </div>
+        </form>
+
+
+        <table class="table table-striped table-bordered table-hover table-responsive clear-group dataTable">
+            <thead>
+                <tr>
+                    <th ng-click='sort("BillToLastName")' class="pointer">Billing Name&nbsp;<i class="fa fa-arrows-v"></i></th>
+                    <th ng-click='sort("GuestLastName")' class="pointer">First Name &nbsp;<i class="fa fa-arrows-v"></i></th>
+                    <th ng-click='sort("StartDate")' class="pointer">Check In &nbsp;<i class="fa fa-arrows-v"></i></th>
+                    <th ng-click='sort("EndDate")' class="pointer">Check Out &nbsp;<i class="fa fa-arrows-v"></i></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="data in filtered = (reservations | filter:search | orderBy : predicate :reverse) | startFrom:(currentPage-1)*searchLimit | limitTo:searchLimit">
+                    <td ng-click="">{{data.BillToFirstName}} {{data.BillToLastName}}</a></td>
+                    <td ng-click="">{{data.GuestFirstName}} {{data.GuestLastName}}</td>
+                    <td ng-click="">{{data.StartDate}}</td>
+                    <td ng-click="">{{data.EndDate}}</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+        <!-- Pagination -->
+        <div ng-show="reservationItems > searchLimit">
+            <pagination ng-model="currentPage" max-size="maxSize" total-items="reservationItems" items-per-page="searchLimit" boundary-links="false" rotate="false"></pagination>
+        </div>
+
+
+    </div>
+</div>

@@ -112,7 +112,7 @@ angular.module('ProtoApp')
     })
     .controller('ReservationController', function ($rootScope, $scope, $http, $timeout, $routeParams) {
         $scope.init = function () {
-            console.log("using reservations");
+            // $scope.getReservations();
             // Get Guest List
             $scope.today = $rootScope.today;
             $scope.entryLimit = 5;
@@ -121,10 +121,16 @@ angular.module('ProtoApp')
 
         };
         $scope.getReservations = function(){
-            $http.post('../ajax/getReservations.php', { StartRange: $scope.today, EndRange: $scope.today }).success(function(res) {
-                // $scope.guestDetails = res;
-                console.log("Got Reservations");
-                console.log(res);
+            var searchStart = $scope.reservationSearch.startDate + " 16:00:00";
+            var searchEnd = $scope.reservationSearch.endDate + " 11:00:00";
+            $http.post('../ajax/getReservations.php', { StartRange: searchStart, EndRange: searchEnd }).success(function(res) {
+                $scope.reservations = res;
+                $scope.reservationItems = $scope.reservations.length;
+                $scope.searchLimit = 10;
+                $scope.entryLimit = 5;
+                $scope.maxSize = 10;
+                $scope.currentPage = 1;
+                // console.log(res);
             })
         };
         $scope.addReservation = function(){
@@ -143,6 +149,9 @@ angular.module('ProtoApp')
                     $scope.submitReservationError = true;
                 } else {
                     $scope.submitReservationSuccess = true;
+                    $scope.reservation = null;
+                    $scope.guest = null;
+                    $scope.searchResults = null;
                 }
             })
         }
@@ -234,6 +243,72 @@ angular.module('ProtoApp')
         $scope.setPage = function (pageNo) {
             $scope.currentPage = pageNo;
             console.log(pageNo);
+        };
+         // Run initializing function
+        $scope.init();
+    })
+    .controller('CheckInController', function ($rootScope, $scope, $http, $timeout, $routeParams, $route, $location) {
+
+        $scope.init = function () {
+            $scope.getToday();
+            if($routeParams.guestID){
+                // do something else
+                // $scope.getGuestDetails();
+            } else if ($routeParams.reservationID){
+                // do something else
+                // $scope.getReservationDetails();
+                console.log("res id is set");
+            } else {
+                // do generic thing
+                $scope.getTodaysReservations();
+            }
+
+        };
+        $scope.go = function(path){
+            console.log(path);
+            $location.path( path );
+        }
+        $scope.getTodaysReservations = function(){
+            var startRange = $scope.today + " 11:00:00";
+            var endRange = $scope.today + " 16:00:00";
+            $http.post('../ajax/getReservations.php', { StartRange: startRange, EndRange: endRange }).success(function(res) {
+                console.log(res);
+                $scope.reservations = res;
+                $scope.reservationItems = $scope.reservations.length;
+                $scope.searchLimit = 10;
+                $scope.entryLimit = 5;
+                $scope.maxSize = 10;
+                $scope.currentPage = 1;
+                // console.log(res);
+            })
+        }
+        $scope.getToday = function(){
+            var tDate = new Date();
+            var year = tDate.getFullYear().toString();
+            var month = (tDate.getMonth()+1).toString();
+            var day = tDate.getDate().toString();
+            $scope.today = year + "-" + month + "-" + day;
+        }
+        $scope.searchGuests = function () {
+            $http.post('../ajax/searchGuests.php', $scope.formData) .success(function(res) {
+                $scope.searchResults = res;
+                $scope.searchItems = $scope.searchResults.length;
+                $scope.searchLimit = 8;
+            })
+        };
+        // On filter, set filteredItems length after a 10 millisecond delay
+        $scope.filter = function () {
+            $timeout( function () {
+                $scope.filteredItems = $scope.filtered.length;
+            }, 10);
+        };
+        // Sort items
+        $scope.sort = function(predicate) {
+            $scope.predicate = predicate;
+            $scope.reverse = !$scope.reverse;
+        };
+        $scope.setPage = function (pageNo) {
+            $scope.currentPage = pageNo;
         };
          // Run initializing function
         $scope.init();

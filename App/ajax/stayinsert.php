@@ -11,8 +11,7 @@
         $data = file_get_contents("php://input");
         $input = json_decode($data);
         // prepare query
-        $query = $db->prepare("call insertstaysp(:BillToID, :GuestID, :ReservationID, :EventID, :RoomID, :RoomType
-            :AnticipatedCheckOut, :Rate, :Deposit)");
+        $query = $db->prepare("call insertstaysp(:BillToID, :GuestID, :ReservationID, :EventID, :RoomID, :RoomType :AnticipatedCheckOut, :Rate, :Deposit)");
        $query->bindParam(':BillToID', $input->BillToID, PDO::PARAM_INT);
         $query->bindParam(':GuestID', $input->GuestID, PDO::PARAM_INT);
         $query->bindParam(':ReservationID', $input->ReservationID, PDO::PARAM_INT);
