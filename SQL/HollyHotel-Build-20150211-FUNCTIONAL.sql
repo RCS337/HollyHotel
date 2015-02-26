@@ -1428,7 +1428,6 @@ BEGIN
 End;$$
 /*****************************************************************************************************************************************************************/
 
-
 DROP PROCEDURE IF EXISTS `InsertStaySp`; $$
 
 CREATE PROCEDURE `InsertStaySp` (
@@ -1446,8 +1445,7 @@ CREATE PROCEDURE `InsertStaySp` (
 BEGIN
 	DECLARE StayID, StayLength, i INT;
 
-	if pBillToID is not null then
-    Begin
+
 		IF pReservationID is Not NULL and pRoomID is Not Null THEN
 			BEGIN
             SELECT
@@ -1457,6 +1455,7 @@ BEGIN
             , 	IFNULL(pRate,r.Rate)
             , 	IFNULL(pDeposit,r.Deposit)
             , 	IFNULL(pRoomType,r.RoomType)
+			,	IFNULL(pBillToID, r.BillToID)
 
             into pGuestID
 			,	pEventID
@@ -1464,14 +1463,15 @@ BEGIN
             ,	pRate
             , 	pDeposit
             ,	pRoomType
+            ,   pBillToID
             FROM RESERVATION r where r.ReservationID=pReservationID;
-
-            UPDATE RESERVATION SET ConvertedToStay = 1 where ReservationID = pReservationID;
-
 
             END;
 		END IF;
-
+        
+        
+	if (pBillToID is not null and pRoomID is Not Null) then
+    Begin
 		INSERT INTO STAY (BillToID, GuestID, ReservationID, EventID, RoomID, RoomType, CheckIn, AnticipatedCheckOut) values (pBillToID, pGuestID, pReservationID, pEventID, pRoomID, pRoomType, NOW(), pAnticipatedCheckOut);
 		SELECT LAST_INSERT_ID() into StayID;
 	
@@ -1481,7 +1481,7 @@ BEGIN
 		WHILE i <STAYLENGTH DO 
         
         INSERT INTO STAY_CHARGES(STAYID, ChargeTo, ChargeType, Amount, ChargeDate, DueDate) 
-        values (StayId, pBillToID, (SELECT TypeNameID from Type_Name where UsageID = 'ChargeType' and Name = 'Room Charges'),pRate, DATEADD(CURDATE(),i), pAnticipatedCheckOut);
+        values (StayId, pBillToID, (SELECT TypeNameID from Type_Name where UsageID = 'ChargeType' and Name = 'Room Charges'),pRate, ADDDATE(CURDATE(),i), pAnticipatedCheckOut);
 		set i=i+1;
         END WHILE;
 
@@ -1491,10 +1491,14 @@ BEGIN
         END IF;
 
 		End;
+       
+       IF pReservationID is Not NULL then 
+                    UPDATE RESERVATION SET ConvertedToStay = 1 where ReservationID = pReservationID;
+		end if;
 
     end if;  # billtoid, roomid
 
-END; $$
+END;$$
 
 /**********************************************************************************************************************************************************/
 

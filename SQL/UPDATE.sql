@@ -227,7 +227,7 @@ r.ReservationID
 , IFNULL(c2.LastName, C.LastName) as GuestLastName
 , a2.Address1  as GuestAddress1
 , a2.Address2  as GuestAddress2
-, a2.City      as GuestToCity
+, a2.City      as GuestCity
 , a2.State     as GuestState
 , a2.Zip       as GuestZip
 , a2.Country   as GuestCountry
@@ -378,7 +378,86 @@ END IF;
 
 END $$
 
+
+
+
+DROP PROCEDURE IF EXISTS `InsertStaySp`; $$
+
+CREATE PROCEDURE `InsertStaySp` (
+  pBillToID  INT
+, pGuestID	INT
+, pReservationID	INT
+, pEventID		Int
+, pRoomID	Int
+, pRoomType Int
+, pAnticipatedCheckOut	DateTime
+, pRate DEC(12,2)
+, pDeposit DEC(12,2)
+
+)
+BEGIN
+	DECLARE StayID, StayLength, i INT;
+
+
+		IF pReservationID is Not NULL and pRoomID is Not Null THEN
+			BEGIN
+            SELECT
+				IFNULL(pGuestID,r.GuestID)
+            ,	IFNULL(pEventID,r.EventID)
+            , 	IFNULL(pAnticipatedCheckOut, r.EndDate)
+            , 	IFNULL(pRate,r.Rate)
+            , 	IFNULL(pDeposit,r.Deposit)
+            , 	IFNULL(pRoomType,r.RoomType)
+			,	IFNULL(pBillToID, r.BillToID)
+
+            into pGuestID
+			,	pEventID
+            , 	pAnticipatedCheckOut
+            ,	pRate
+            , 	pDeposit
+            ,	pRoomType
+            ,   pBillToID
+            FROM RESERVATION r where r.ReservationID=pReservationID;
+
+            END;
+		END IF;
+        
+        
+	if (pBillToID is not null and pRoomID is Not Null) then
+    Begin
+		INSERT INTO STAY (BillToID, GuestID, ReservationID, EventID, RoomID, RoomType, CheckIn, AnticipatedCheckOut) values (pBillToID, pGuestID, pReservationID, pEventID, pRoomID, pRoomType, NOW(), pAnticipatedCheckOut);
+		SELECT LAST_INSERT_ID() into StayID;
+	
+    
+		SET STAYLENGTH = DATEDIFF(pAnticipatedCheckOut,CURDATE());
+        SET i=0;
+		WHILE i <STAYLENGTH DO 
+        
+        INSERT INTO STAY_CHARGES(STAYID, ChargeTo, ChargeType, Amount, ChargeDate, DueDate) 
+        values (StayId, pBillToID, (SELECT TypeNameID from Type_Name where UsageID = 'ChargeType' and Name = 'Room Charges'),pRate, ADDDATE(CURDATE(),i), pAnticipatedCheckOut);
+		set i=i+1;
+        END WHILE;
+
+		IF IFNULL(pDeposit,0)<> 0 THEN
+                INSERT INTO STAY_CHARGES(STAYID, ChargeTo, ChargeType, Amount, ChargeDate, DueDate) 
+					values (StayId, pBillToID, (SELECT TypeNameID from Type_Name where UsageID = 'ChargeType' and Name = 'Deposit'),-1*pRate, Now(), pAnticipatedCheckOut);
+        END IF;
+
+		End;
+       
+       IF pReservationID is Not NULL then 
+                    UPDATE RESERVATION SET ConvertedToStay = 1 where ReservationID = pReservationID;
+		end if;
+
+    end if;  # billtoid, roomid
+
+END;
+
+
 $$
+
+
+
 
 delimiter ;
 
