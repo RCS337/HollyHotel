@@ -17,7 +17,7 @@ angular.module('ProtoApp')
         $scope.title = "DashBoard Control";
         $scope.message = "Dashboard Message";
     })
-    .controller('GuestsController', function ($rootScope, $scope, $http, $timeout, $route, $routeParams, GuestListFactory) {
+    .controller('GuestsController', function ($rootScope, $scope, $http, $timeout, $route, $routeParams, $location, $routeParams) {
         // Set page title
         $rootScope.title = $route.current.title;
 
@@ -26,7 +26,7 @@ angular.module('ProtoApp')
             if($routeParams.guestID){
                 $http.post('../ajax/guestDetails.php', { CustomerID: $routeParams.guestID }).success(function(res) {
                     $scope.guest = res;
-                });
+                })
             }
             // Sample Data {customerID: "123", FirstName: "David", LastName: "Moore", contactInfoConfidential: 0, BillToAddress1: "123 RoadName Rd", BillToAddress2: null, BillToAddress3: null, BillToAddress4: null, BillToCity: "Madison" , BillToState: "WI", BillToZip: "53716", BillToCountry: "USA", BillToPhone: "6085556666"};
             $scope.billing = {billingID: "123", name: "David Moore", cardType: "Visa", BillToAddress1: "123 RoadName Rd", BillToAddress2: null, BillToAddress3: null, BillToAddress4: null, BillToCity: "Madison" , BillToState: "WI", BillToZip: "53716", BillToCountry: "USA"};
@@ -38,7 +38,19 @@ angular.module('ProtoApp')
             // Set default current page for pagination
             $scope.currentPage = 1;
         };
-
+        $scope.insertCustomer = function(){
+            console.log($scope.guest);
+                $http.post('../ajax/insertCustomer.php', $scope.guest ).success(function(res) {
+                    console.log(res);
+                })
+        }
+        $scope.insertCheckInCustomer = function(){
+                $http.post('../ajax/insertCustomer.php', $scope.guest ).success(function(res) {
+                    $scope.guestID = res;
+                    var path = '/checkin/guest/' + $scope.guestID;
+                    $location.path( path );
+                })
+        }
         $scope.searchGuests = function () {
             $http.post('../ajax/searchGuests.php', $scope.formData) .success(function(res) {
                 $scope.searchResults = res;
@@ -252,8 +264,8 @@ angular.module('ProtoApp')
         $scope.init = function () {
             $scope.getToday();
             if($routeParams.guestID){
-                // do something else
-                // $scope.getGuestDetails();
+                $scope.guestID = $routeParams.guestID;
+                $scope.getGuestDetails($scope.guestID);
             } else if ($routeParams.reservationID){
                 // do something else
                 // $scope.getReservationDetails();
@@ -269,13 +281,74 @@ angular.module('ProtoApp')
             console.log(path);
             $location.path( path );
         }
+        $scope.getGuestDetails = function(guestID){
 
+            $http.post('../ajax/guestDetails.php', { CustomerID: guestID }).success(function(res) {
+                console.log(res);
+                $scope.billingPartry = res;
+                $scope.guest = res;
+            })
+        }
+        $scope.getRoomList = function(){
+            console.log("searching...");
+            $scope.pstartdate = $scope.roomForm.pstartdate + " 16:00:00";
+            $scope.penddate = $scope.roomForm.pstartdate + " 11:00:00";
+            $scope.proomtype = $scope.roomForm.proomtype;
+            $scope.psmoking = $scope.roomForm.psmoking;
+
+            $http.post('../ajax/getAvailableRooms.php', { pstartdate: $scope.pstartdate, penddate: $scope.penddate, proomtype: $scope.proomtype, psmoking: $scope.psmoking, prequirements: null }).success(function(res) {
+                $scope.roomList = res;
+                console.log(res);
+                $scope.filteredItems = $scope.roomList.length;
+                $scope.searchLimit = 10;
+                $scope.entryLimit = 5;
+                $scope.maxSize = 10;
+                $scope.currentPage = 1;
+            })
+        }
         $scope.getReservationDetails = function(resID){
             var ReservationID = resID;
             $http.post('../ajax/reservationDetails.php', { ReservationID: ReservationID }).success(function(res) {
+                console.log(res);
+
+                // var startDate = new Date($scope.resDetails.StartDate);
+                // var date = startDate.getDate();
+                // var month = startDate.getMonth();
+                // var year = startDate.getFullYear();
+                // $scope.resDetails.StartDate = startDate;
+                // var EndDate = new Date($scope.resDetails.EndDate);
+                // var date = EndDate.getDate();
+                // var month = EndDate.getMonth();
+                // var year = EndDate.getFullYear();
+                // $scope.resDetails.EndDate = EndDate;
+                // console.log(startDate);
                 $scope.resDetails = res;
                 $scope.getReservationRooms();
+                $http.post('../ajax/guestDetails.php', { CustomerID: $scope.resDetails.GuestID }).success(function(res) {
+                    console.log(res);
+                    $scope.guest = res;
+                })
+                $http.post('../ajax/guestDetails.php', { CustomerID: $scope.resDetails.BillToID }).success(function(res) {
+                    console.log(res);
+                    $scope.billingPartry = res;
+                })
             })
+        }
+        $scope.checkIn = function(){
+            $scope.checkindata = { BillToID: $scope.resDetails.BillToID, GuestID: $scope.resDetails.GuestID, ReservationID: $scope.resDetails.ReservationID, EventID: $scope.resDetails.EventID, RoomID: $scope.RoomID, RoomType: $scope.resDetails.RoomType, AnicipatedCheckout: $scope.resDetails.EndDate, Rate: null, Deposit: null }
+            console.log($scope.checkindata);
+                $http.post('../ajax/stayinsert.php', { BillToID: $scope.resDetails.BillToID, GuestID: null, ReservationID: $scope.resDetails.ReservationID, EventID: null, RoomID: $scope.RoomID, RoomType: null, AnicipatedCheckout: null, Rate: null, Deposit: null }).success(function(res) {
+                    console.log(res);
+                    // $http.post('../ajax/guestDetails.php', { BillToID: $scope.resDetails.BillToID, GuestID: $scope.resDetails.GuestID, ReservationID: $scope.resDetails.ReservationID, EventID: $scope.resDetails.EventID, RoomID: $scope.RoomID, RoomType: $scope.resDetails.RoomType, AnicipatedCheckout: $scope.resDetails.EndDate, Rate: null, Deposit: null }).success(function(res) {
+                    //     console.log(res);
+
+                    // })
+                })
+        }
+        $scope.selectRoom = function(roomID){
+            $scope.RoomID = roomID;
+            $scope.checkIn();
+
         }
         $scope.getReservationRooms = function(){
             $scope.pstartdate = $scope.resDetails.StartDate.toString();
@@ -300,10 +373,6 @@ angular.module('ProtoApp')
                 $scope.maxSize = 10;
                 $scope.currentPage = 1;
             });
-        }
-        $scope.selectRoom = function(roomID){
-            $scope.roomID = roomID;
-            console.log($scope.roomID);
         }
         $scope.getTodaysReservations = function(){
             var startRange = $scope.today;// + " 11:00:00";

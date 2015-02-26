@@ -42,31 +42,31 @@
         <div class="panel-body">
 
             <div class="col-xs-6 form-group">
-                <input type="text" name="firstName" placeholder="First Name" class="form-control" ng-model="guest.FirstName"/>
+                <input type="text" name="firstName" placeholder="First Name" class="form-control" ng-model="billingPartry.FirstName"/>
             </div>
             <div class="col-xs-6 form-group">
-                <input type="text" name="lastName" placeholder="Last Name" class="form-control" ng-model="guest.LastName"/>
+                <input type="text" name="lastName" placeholder="Last Name" class="form-control" ng-model="billingPartry.LastName"/>
             </div>
             <div class="col-xs-12 form-group">
-                <input type="text" name="address1" placeholder="Street Address, Line 1" class="form-control" ng-model="guest.BillToAddress1"/>
+                <input type="text" name="address1" placeholder="Street Address, Line 1" class="form-control" ng-model="billingPartry.BillToAddress1"/>
             </div>
             <div class="col-xs-12 form-group">
-                <input type="text" name="address2" placeholder="Street Address, Line 2" class="form-control" ng-model="guest.BillToAddress2"/>
+                <input type="text" name="address2" placeholder="Street Address, Line 2" class="form-control" ng-model="billingPartry.BillToAddress2"/>
             </div>
             <div class="col-xs-12 col-sm-3 form-group">
-                <input type="text" name="city" placeholder="City" class="form-control" ng-model="guest.BillToCity"/>
+                <input type="text" name="city" placeholder="City" class="form-control" ng-model="billingPartry.BillToCity"/>
             </div>
             <div class="col-xs-4 col-sm-3 form-group">
-                <input type="text" name="state" placeholder="State" class="form-control" ng-model="guest.BillToState"/>
+                <input type="text" name="state" placeholder="State" class="form-control" ng-model="billingPartry.BillToState"/>
             </div>
             <div class="col-xs-4 col-sm-3 form-group">
-                <input type="text" name="zip" placeholder="Zip Code" class="form-control" ng-model="guest.BillToZip"/>
+                <input type="text" name="zip" placeholder="Zip Code" class="form-control" ng-model="billingPartry.BillToZip"/>
             </div>
             <div class="col-xs-4 col-sm-3 form-group">
-                <input type="text" name="country" placeholder="Country" class="form-control" ng-model="guest.BillToCountry"/>
+                <input type="text" name="country" placeholder="Country" class="form-control" ng-model="billingPartry.BillToCountry"/>
             </div>
             <div class="col-xs-12 col-md-6 form-group">
-                <input type="text" name="phone" placeholder="Phone" class="form-control" ng-model="guest.BillToPhone"/>
+                <input type="text" name="phone" placeholder="Phone" class="form-control" ng-model="billingPartry.BillToPhone"/>
             </div>
         </div>
     </div>
@@ -78,13 +78,13 @@
     <div class="panel-heading"><h3 class="panel-title">Room Options</h3></div>
     <div class="panel-body">
             <div class="form-group col-xs-6 col-md-3">
-                <input class="form-control datepicker" type="text" ng-model="reservation.startdate" placeholder="Check In" ui-date ui-date-format="yy-mm-dd" required>
+                <input class="form-control datepicker" type="text" ng-model="resDetails.StartDate" placeholder="Check In" ui-date ui-date-format="yy-mm-dd" required>
             </div>
             <div class="form-group col-xs-6 col-md-3">
-                <input class="form-control datepicker" type="text" ng-model="reservation.enddate" placeholder="Check Out" ui-date ui-date-format="yy-mm-dd" required>
+                <input class="form-control datepicker" type="text" ng-model="resDetails.EndDate" placeholder="Check Out" ui-date ui-date-format="yy-mm-dd" required>
             </div>
             <div class="form-group col-xs-6 col-md-3">
-                <select class="form-control" ng-model="reservation.roomtype" required>
+                <select class="form-control" ng-model="resDetails.RoomType">
                     <option value="" selected>Room Type</option>
                     <option value="15" selected>Sleeping Room</option>
                     <option value="16">Meeting Room</option>
@@ -92,19 +92,18 @@
                 </select>
             </div>
             <div class="form-group col-xs-6 col-md-3">
-                <select class="form-control" ng-model="reservation.smoking" required>
+                <select class="form-control" ng-model="resDetails.Smoking">
                     <option value="" selected>Smoking Pref</option>
                     <option value="0" selected>Non-Smoking</option>
                     <option value="1">Smoking</option>
                 </select>
             </div>
             <div class="form-group col-xs-12 col-md-6">
-                <select class="form-control" ng-model="reservation.eventID" ng-options="event.id as event.name for event in events">
-                <option value="" selected>Event</option>
+                <input type="text" class="form-control" ng-model="resDetails.EventName" placeholder="Event Name">
                 </select>
             </div>
             <div class="form-group col-xs-12 col-md-6">
-                <select class="form-control" ng-model="reservation.capacity">
+                <select class="form-control" ng-model="resDetails.capacity">
                     <option value="" selected>Capacity</option>
                     <option value="1">1</option>
                     <option value="2">2</option>
@@ -138,12 +137,12 @@
             <tbody>
                 <tr ng-repeat="data in filtered = (availRooms | filter:search | orderBy : predicate :reverse) | startFrom:(currentPage-1)*searchLimit | limitTo:searchLimit">
                     <td><button class="btn btn-xs btn-primary" ng-click="selectRoom(data.RoomID)">Check In</button></td>
-                    <td ng-click="go('/guests/' + data.CustomerID)">{{data.RoomNumber}}</td>
-                    <td ng-click="go('/guests/' + data.CustomerID)">{{data.Beds}}</td>
-                    <td ng-click="go('/guests/' + data.CustomerID)">{{data.Features}}</td>
-                    <td ng-click="go('/guests/' + data.CustomerID)">{{data.SmokingAllowed}}</td>
-                    <td ng-click="go('/guests/' + data.CustomerID)">{{data.BuildingName}}</td>
-                    <td ng-click="go('/guests/' + data.CustomerID)">{{data.WingName}}</td>
+                    <td>{{data.RoomNumber}}</td>
+                    <td>{{data.Beds}}</td>
+                    <td>{{data.Features}}</td>
+                    <td>{{data.SmokingAllowed}}</td>
+                    <td>{{data.BuildingName}}</td>
+                    <td>{{data.WingName}}</td>
                 </tr>
                 </tr>
             </tbody>
@@ -156,6 +155,44 @@
 
     </div>
 </div>
-
-
 </form>
+
+<div class="panel panel-default">
+    <div class="panel-heading"><h3 class="panel-title"></h3></div>
+    <div class="panel-body">
+    <div class="report">
+        <h3>Guest: {{stay.GuestFirstName}} {{stay.GuestLastName}}</h3>
+        <hr>
+        <table class="report">
+            <tr>
+                <td><strong>Room:</strong></td>
+                <td>{{stay.RoomNumber}}</td>
+            </tr>
+            <tr>
+                <td><strong>CheckIn:</strong></td>
+                <td>{{stay.Checkin}}</td>
+            </tr>
+            <tr>
+                <td><strong>Check Out:</strong></td>
+                <td>{{stay.AnticipatedCheckOut}}</td>
+            </tr>
+            <tr>
+                <td><strong>Rate:</strong></td>
+                <td>{{stay.RoomRate}}</td>
+            </tr>
+            <tr>
+                <td><strong>Billing Party:</strong></td>
+                <td>{{stay.BillToFirstName}} {{stay.BillToLastname}}</td>
+            </tr>
+        </table>
+        <div class="report-body">
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+        </div>
+        <h5 class="report">Guest Signature</h5>
+        <hr class="signature">
+
+    </div>
+    </div>
+</div>

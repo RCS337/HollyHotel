@@ -19,12 +19,15 @@
         $query->bindParam(':RoomID', $input->RoomID, PDO::PARAM_INT);
         $query->bindParam(':RoomType', $input->RoomType, PDO::PARAM_INT);
         $query->bindParam(':AnticipatedCheckOut', $input->AnticipatedCheckOut, PDO::PARAM_STR);
-        $query->bindParam(':Rate', $input->Rate PDO::PARAM_STR);
-        $query->bindParam(':Deposit', $input->Deposit PDO::PARAM_STR);
+        $query->bindParam(':Rate', $input->Rate, PDO::PARAM_STR);
+        $query->bindParam(':Deposit', $input->Deposit, PDO::PARAM_STR);
        // execute query
         $query->execute();
         // null (close) database object
+        $lastID = $db->lastInsertId();
+        echo($lastID);
         $db = null;
+        return $lastID;
     // Catch and echo any exceptions that occure
     } catch ( PDOException $e ){
         echo $e -> getMessage();

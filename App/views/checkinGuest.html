@@ -1,1 +1,186 @@
-<h1>Check In Guest</h1>
+<h1>Checking in Guest</h1>
+
+<form>
+
+
+    <div class="panel panel-default">
+        <div class="panel-heading"><h3 class="panel-title">Guest Information</h3></div>
+        <div class="panel-body">
+
+            <div class="col-xs-6 form-group">
+                <input type="text" name="firstName" placeholder="First Name" class="form-control" ng-model="guest.FirstName"/>
+            </div>
+            <div class="col-xs-6 form-group">
+                <input type="text" name="lastName" placeholder="Last Name" class="form-control" ng-model="guest.LastName"/>
+            </div>
+            <div class="col-xs-12 form-group">
+                <input type="text" name="address1" placeholder="Street Address, Line 1" class="form-control" ng-model="guest.BillToAddress1"/>
+            </div>
+            <div class="col-xs-12 form-group">
+                <input type="text" name="address2" placeholder="Street Address, Line 2" class="form-control" ng-model="guest.BillToAddress2"/>
+            </div>
+            <div class="col-xs-12 col-sm-3 form-group">
+                <input type="text" name="city" placeholder="City" class="form-control" ng-model="guest.BillToCity"/>
+            </div>
+            <div class="col-xs-4 col-sm-3 form-group">
+                <input type="text" name="state" placeholder="State" class="form-control" ng-model="guest.BillToState"/>
+            </div>
+            <div class="col-xs-4 col-sm-3 form-group">
+                <input type="text" name="zip" placeholder="Zip Code" class="form-control" ng-model="guest.BillToZip"/>
+            </div>
+            <div class="col-xs-4 col-sm-3 form-group">
+                <input type="text" name="country" placeholder="Country" class="form-control" ng-model="guest.BillToCountry"/>
+            </div>
+            <div class="col-xs-12 col-md-6 form-group">
+                <input type="text" name="phone" placeholder="Phone" class="form-control" ng-model="guest.BillToPhone"/>
+            </div>
+        </div>
+    </div>
+
+        <div class="panel panel-default">
+        <div class="panel-heading"><h3 class="panel-title">Billing Information</h3></div>
+        <div class="panel-body">
+
+            <div class="col-xs-6 form-group">
+                <input type="text" name="firstName" placeholder="First Name" class="form-control" ng-model="billingPartry.FirstName"/>
+            </div>
+            <div class="col-xs-6 form-group">
+                <input type="text" name="lastName" placeholder="Last Name" class="form-control" ng-model="billingPartry.LastName"/>
+            </div>
+            <div class="col-xs-12 form-group">
+                <input type="text" name="address1" placeholder="Street Address, Line 1" class="form-control" ng-model="billingPartry.BillToAddress1"/>
+            </div>
+            <div class="col-xs-12 form-group">
+                <input type="text" name="address2" placeholder="Street Address, Line 2" class="form-control" ng-model="billingPartry.BillToAddress2"/>
+            </div>
+            <div class="col-xs-12 col-sm-3 form-group">
+                <input type="text" name="city" placeholder="City" class="form-control" ng-model="billingPartry.BillToCity"/>
+            </div>
+            <div class="col-xs-4 col-sm-3 form-group">
+                <input type="text" name="state" placeholder="State" class="form-control" ng-model="billingPartry.BillToState"/>
+            </div>
+            <div class="col-xs-4 col-sm-3 form-group">
+                <input type="text" name="zip" placeholder="Zip Code" class="form-control" ng-model="billingPartry.BillToZip"/>
+            </div>
+            <div class="col-xs-4 col-sm-3 form-group">
+                <input type="text" name="country" placeholder="Country" class="form-control" ng-model="billingPartry.BillToCountry"/>
+            </div>
+            <div class="col-xs-12 col-md-6 form-group">
+                <input type="text" name="phone" placeholder="Phone" class="form-control" ng-model="billingPartry.BillToPhone"/>
+            </div>
+        </div>
+    </div>
+
+<div class="panel panel-default">
+    <div class="panel-heading"><h3 class="panel-title">Available Rooms</h3></div>
+    <div class="panel-body">
+
+
+<form class="clearfix">
+        <div class="form-group col-xs-4 col-md-2">
+            <input class="form-control datepicker" type="text" ng-model="roomForm.pstartdate" placeholder="Check In" ui-date ui-date-format="yy-mm-dd" required>
+        </div>
+        <div class="form-group col-xs-4 col-md-2">
+            <input class="form-control datepicker" type="text" ng-model="roomForm.penddate" placeholder="Check Out" ui-date ui-date-format="yy-mm-dd" required>
+        </div>
+        <div class="form-group col-xs-4 col-md-2">
+            <select class="form-control" ng-model="roomForm.proomtype" required>
+                <option value="" disabled selected>Room Type</option>
+                <option value="15">Sleeping Room</option>
+                <option value="16">Meeting Room</option>
+                <option value="17">Suite</option>
+            </select>
+        </div>
+        <div class="form-group col-xs-4 col-md-2">
+            <select class="form-control" ng-model="roomForm.psmoking" required>
+                <option value="" disabled selected>Smoking</option>
+                <option value="0">Non-Smoking</option>
+                <option value="1">Smoking</option>
+            </select>
+        </div>
+        <div class="col-xs-4 col-md-2 form-group">
+                <button class="btn btn-primary pull-left" ng-click="getRoomList()">Search for Rooms</button>
+         </div>
+    </form>
+
+
+
+
+
+
+
+        <div class="table-responsive"ng-show="filteredItems > 0">
+        <table class="table table-striped table-bordered table-hover table-responsive clear-group dataTable">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th ng-click='sort("RoomNumber")' class="pointer">Room Number &nbsp;<i class="fa fa-arrows-v"></i></th>
+                    <th ng-click='sort("Beds")' class="pointer">Beds &nbsp;<i class="fa fa-arrows-v"></i></th>
+                    <th ng-click='sort("Features")' class="pointer">Features &nbsp;<i class="fa fa-arrows-v"></i></th>
+                    <th ng-click='sort("SmokingAllowed")' class="pointer">Smoking &nbsp;<i class="fa fa-arrows-v"></i></th>
+                    <th ng-click='sort("BuildingName")' class="pointer">Building &nbsp;<i class="fa fa-arrows-v"></i></th>
+                    <th ng-click='sort("WingName")' class="pointer">Wing &nbsp;<i class="fa fa-arrows-v"></i></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="data in filtered = (roomList | filter:search | orderBy : predicate :reverse) | startFrom:(currentPage-1)*searchLimit | limitTo:searchLimit">
+                    <td><button class="btn btn-xs btn-primary" ng-click="selectRoom(data.RoomID)">Check In</button></td>
+                    <td>{{data.RoomNumber}}</td>
+                    <td>{{data.Beds}}</td>
+                    <td>{{data.Features}}</td>
+                    <td>{{data.SmokingAllowed}}</td>
+                    <td>{{data.BuildingName}}</td>
+                    <td>{{data.WingName}}</td>
+                </tr>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+        <!-- Pagination -->
+        <div ng-show="filteredItems > entryLimit">
+            <pagination ng-model="currentPage" max-size="maxSize" total-items="filteredItems" items-per-page="searchLimit" boundary-links="false" rotate="false"></pagination>
+        </div>
+
+    </div>
+</div>
+</form>
+
+<div class="panel panel-default">
+    <div class="panel-heading"><h3 class="panel-title"></h3></div>
+    <div class="panel-body">
+    <div class="report">
+        <h3>Guest: {{stay.GuestFirstName}} {{stay.GuestLastName}}</h3>
+        <hr>
+        <table class="report">
+            <tr>
+                <td><strong>Room:</strong></td>
+                <td>{{stay.RoomNumber}}</td>
+            </tr>
+            <tr>
+                <td><strong>CheckIn:</strong></td>
+                <td>{{stay.Checkin}}</td>
+            </tr>
+            <tr>
+                <td><strong>Check Out:</strong></td>
+                <td>{{stay.AnticipatedCheckOut}}</td>
+            </tr>
+            <tr>
+                <td><strong>Rate:</strong></td>
+                <td>{{stay.RoomRate}}</td>
+            </tr>
+            <tr>
+                <td><strong>Billing Party:</strong></td>
+                <td>{{stay.BillToFirstName}} {{stay.BillToLastname}}</td>
+            </tr>
+        </table>
+        <div class="report-body">
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+        </div>
+        <h5 class="report">Guest Signature</h5>
+        <hr class="signature">
+
+    </div>
+    </div>
+</div>

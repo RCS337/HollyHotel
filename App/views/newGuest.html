@@ -1,11 +1,11 @@
 <h1>Add New Guest</h1>
 <hr>
+<form>
 <!-- Guest Info Panel -->
 <div class="panel panel-default">
     <!-- Panel Heading -->
     <div class="panel-heading"><h3 class="panel-title">Guest Details</h3></div>
     <div class="panel-body">
-    	<form class="clearfix">
         <legend>Personal Information</legend>
             <div class="col-xs-6 form-group">
             <label for="firstname">First Name: </label>
@@ -17,81 +17,77 @@
             </div>
             <div class="col-xs-12 form-group">
                 <label for="address1">Street Address: </label>
-                <input type="text" name="address1" placeholder="Street Address, Line 1" class="form-control" ng-model="guest.BillToAddress1"/>
+                <input type="text" name="address1" placeholder="Street Address, Line 1" class="form-control" ng-model="guest.address1"/>
             </div>
             <div class="col-xs-12 form-group">
-            	<input type="text" name="address2" placeholder="Street Address, Line 2" class="form-control" ng-model="guest.BillToAddress2"/>
+            	<input type="text" name="address2" placeholder="Street Address, Line 2" class="form-control" ng-model="guest.address2"/>
             </div>
             <div class="col-xs-12 col-sm-3 form-group">
                 <label for="city">City: </label>
-                <input type="text" name="city" placeholder="City" class="form-control" ng-model="guest.BillToCity"/>
+                <input type="text" name="city" placeholder="City" class="form-control" ng-model="guest.city"/>
             </div>
             <div class="col-xs-4 col-sm-3 form-group">
                 <label for="state">State: </label>
-                <input type="text" name="state" placeholder="State" class="form-control" ng-model="guest.BillToState"/>
+                <input type="text" name="state" placeholder="State" class="form-control" ng-model="guest.state"/>
             </div>
             <div class="col-xs-4 col-sm-3 form-group">
                 <label for="zip">ZIP: </label>
-                <input type="text" name="zip" placeholder="Zip Code" class="form-control" ng-model="guest.BillToZip"/>
+                <input type="text" name="zip" placeholder="Zip Code" class="form-control" ng-model="guest.zip"/>
             </div>
             <div class="col-xs-4 col-sm-3 form-group">
                 <label for="country">Country: </label>
-                <input type="text" name="country" placeholder="Country" class="form-control" ng-model="guest.BillToCountry"/>
+                <input type="text" name="country" placeholder="Country" class="form-control" ng-model="guest.Country"/>
             </div>
             <div class="col-xs-12 col-md-6 form-group">
                 <label for="phone">Phone: </label>
-                <input type="text" name="phone" placeholder="Phone" class="form-control" ng-model="guest.BillToPhone"/>
+                <input type="text" name="phone" placeholder="Phone" class="form-control" ng-model="guest.phoneNum"/>
             </div>
-        </form>
 
-        <form class="clear-group clearfix">
             <legend>Payment Information</legend>
-            <div class="col-xs-12 form-group">
+            <div class="col-md-12 form-group">
             <label for="firstname">Name on Card: </label>
-                <input type="text" name="cardName" placeholder="Name on Card" class="form-control"/>
+                <input type="text" name="cardName" placeholder="Name on Card" class="form-control" ng-model="guest.nameOnCard"/>
             </div>
             <div class="col-md-6 form-group">
                 <label for="cardnumber">Card Number: </label>
-                <input type="text" name="cardnumber" placeholder="Last Name" class="form-control"/>
+                <input type="text" name="cardnumber" placeholder="Credit Card Number" class="form-control" ng-model="guest.CCNumber"/>
             </div>
             <div class="col-md-3 form-group">
-                <label for="firstname">Card Type </label>
-                <select name="cardtype" class="form-control"/>
-                    <option value="visa">Visa</option>
-                    <option value="visa">MasterCard</option>
-                    <option value="visa">Discover</option>
-                    <option value="visa">American Express</option>
+                <label for="expyear">ExpYear</label>
+                <select name="expyear" class="form-control" ng-model="guest.ExpYear">
+                               <option value="2015">2015</option>
+                    <option value="2016">2016</option>
+                    <option value="2017">2017</option>
+                    <option value="2018">2018</option>
                 </select>
             </div>
-            <div class="col-md-12 form-group">
-                <label for="address1">Billing Address: </label>
-                <input type="text" name="address1" placeholder="Street Address, Line 1" class="form-control"/>
+            <div class="col-md-3 form-group">
+                <label for="expmonth">ExpMonth</label>
+                <select name="expmonth" class="form-control" ng-model="guest.ExpMonth">
+                    <option value="01">01</option>
+                    <option value="02">02</option>
+                    <option value="03">03</option>
+                    <option value="04">04</option>
+                    <option value="05">05</option>
+                    <option value="06">06</option>
+                    <option value="07">07</option>
+                    <option value="08">08</option>
+                    <option value="09">09</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                </select>
             </div>
-            <div class="col-md-12 form-group">
-                <input type="text" name="address2" placeholder="Street Address, Line 2" class="form-control"/>
-            </div>
-            <div class="col-xs-6 col-sm-3 form-group">
-                <label for="city">City: </label>
-                <input type="text" name="city" placeholder="City" class="form-control"/>
-            </div>
-            <div class="col-xs-6 col-sm-3 form-group">
-                <label for="state">State: </label>
-                <input type="text" name="state" placeholder="State" class="form-control"/>
-            </div>
-            <div class="col-xs-6 col-sm-3 form-group">
-                <label for="zip">ZIP: </label>
-                <input type="text" name="zip" placeholder="Zip Code" class="form-control"/>
-            </div>
-            <div class="col-xs-6 col-sm-3 form-group">
-                <label for="country">Country: </label>
-                <input type="text" name="country" placeholder="Country" class="form-control"/>
-            </div>
-        </form>
 
-        <div class="col-xs-12 form-group clear-group">
-            <button type="button" class="pull-left btn btn-primary" name="update" ng-click="">Submit</button>
-            <button type="button" class="pull-right btn btn-success" name="update" ng-click="">Check In</button>
+        <div class="col-md-4 form-group clear-group pull-left">
+            <button type="button" class="pull-left btn btn-block btn-lg btn-primary" name="update" ng-click="insertCustomer()">Submit</button>
         </div>
+        <div class="col-md-4 form-group clear-group pull-right">
+            <button type="button" class="pull-right btn btn-block btn-lg btn-success" name="update" ng-click="insertCheckInCustomer()">Check In</button>
+        </div>
+
+
 
     </div><!-- /.panel-body -->
 </div><!-- /.panel -->
+</form>

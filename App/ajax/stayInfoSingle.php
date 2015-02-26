@@ -9,7 +9,8 @@
         $data = file_get_contents("php://input");
         $input = json_decode($data);
         // prepare query
-        $query = $db->prepare("SELECT * FROM stayinfovw");
+        $query = $db->prepare("SELECT * FROM stayinfovw WHERE ");
+        $query->bindParam(':id', $input->id, PDO::PARAM_STR);
         // execute query
         $query->execute();
         $response = $query->fetch(PDO::FETCH_ASSOC);

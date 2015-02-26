@@ -6,7 +6,7 @@
 
 body {
     /*background-color: #000000;*/
-    background: url(images/hotel-bg.jpg) no-repeat center center fixed; 
+    background: url(images/hotel-bg.jpg) no-repeat center center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
@@ -27,6 +27,22 @@ body {
 }
 .sidebar {
     margin-top: 101px;
+}
+div.report {
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, .4);
+  border: thin solid #e3e3e3;
+  width: 100%;
+  padding: 3em;
+}
+div.report-body {
+    margin: 3em 0;
+}
+table.report {
+    width: 100%;
+}
+hr.signature{
+    border-color: #000;
+    margin-top: 0;
 }
 #navigation {
     /*background: #3C8DBC;*/

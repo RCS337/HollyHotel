@@ -11,9 +11,12 @@ try {
     // Execute query and place results into an associative array
     $query->execute();
     $response = array();
+    $i = 0;
     foreach ($query->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        if($i == 0){
         $response[] = $row;
-    }
+        $i++;
+    }}
     // JSON-encode the response
     $json_response = json_encode( $response );
     // Return the response to Angular
