@@ -1009,9 +1009,23 @@ r.ReservationID
 ,r.BillToID
 ,c.FirstName as BillToFirstName
 ,c.LastName  as BillToLastName
+,a1.Address1 as BillToAddress1
+,a1.Address2 as BillToAddress2
+,a1.City     as BillToCity
+,a1.State    as BillToState
+,a1.Zip      as BillToZip
+,a1.Country  as BillToCountry
+,p1.PhoneNum as BillToPhone
 , r.GuestID
 , IFNULL(c2.FirstName, c.FirstName) as GuestFirstName
 , IFNULL(c2.LastName, C.LastName) as GuestLastName
+, a2.Address1  as GuestAddress1
+, a2.Address2  as GuestAddress2
+, a2.City      as GuestCity
+, a2.State     as GuestState
+, a2.Zip       as GuestZip
+, a2.Country   as GuestCountry
+, p2.PhoneNum  as GuestPhone
 , r.EventID
 , e.EventName
 , e.HostID
@@ -1034,16 +1048,23 @@ FROM RESERVATION r
 JOIN ResFeaturesVw rf on rf.ReservationID=r.ReservationID
 JOIN TYPE_NAME tn on rf.Bed_FeatureID=TypeNameID
 JOIN CUSTOMER c on c.CustomerID=r.BillToID
+JOIN ADDRESS a1 on r.BillToID = a1.CustomerID and a1.AddressSeq = 0
+JOIN PHONE p1 on r.BillToID=p1.CustomerID and p1.PhoneNumSeq =0
+
 Left Outer Join CUSTOMER c2 on c2.CustomerID=r.GuestID
 LEFT Outer Join `EVENT` e on e.EventID=r.EventID
 LEFT OUTER JOIN CUSTOMER c3 on c3.CustomerID=e.HostID
+JOIN ADDRESS a2 on r.GuestID = a2.CustomerID and a2.AddressSeq = 0
+JOIN PHONE p2 on r.GuestID=p2.CustomerID and p2.PhoneNumSeq =0
+
 JOIN TYPE_NAME rt on rt.TypeNameID=r.RoomType
+
+
 
 WHERE R.ConvertedToStay = 0
 and r.EndDate >= NOW()
-group by r.ReservationID
+group by r.ReservationID;
 
-;
 $$
 
 /*************************************************************************************************************************************/

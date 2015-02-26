@@ -6,7 +6,8 @@
         $data = file_get_contents("php://input");
         $input = json_decode($data);
         // prepare query
-        $query = $db->prepare("SELECT ReservationID, ParentResID, BillToID, BillToFirstName, BillToLastName, GuestID, GuestFirstName, GuestLastName, EventID, EventName, HostID, HostFirstName, HostLastName, RoomType, RoomTypeName, StartDate, EndDate, Rate, Deposit, RoomID, Smoking, ConvertedToStay, Features, Feature_Description FROM reservationinfovw WHERE ReservationID = :ReservationID");
+        $query = $db->prepare("SELECT ReservationID, ParentResID, BillToID, BillToFirstName, BillToLastName, BillToAddress1, BillToAddress2, BillToCity, BillToState, BillToZip, BillToCountry, BillToPhone, 
+            GuestID, GuestFirstName, GuestLastName, GuessAddress1, GuestAddress2, GuestCity, GuestState, GuestZip, GuestCountry, EventID, EventName, HostID, HostFirstName, HostLastName, RoomType, RoomTypeName, StartDate, EndDate, Rate, Deposit, RoomID, Smoking, ConvertedToStay, Features, Feature_Description FROM reservationinfovw WHERE ReservationID = :ReservationID");
         $query->bindValue(':ReservationID', $input->ReservationID, PDO::PARAM_INT);
         // execute query
         $query->execute();
