@@ -28,8 +28,6 @@ angular.module('ProtoApp')
                     $scope.guest = res;
                 })
             }
-            // Sample Data {customerID: "123", FirstName: "David", LastName: "Moore", contactInfoConfidential: 0, BillToAddress1: "123 RoadName Rd", BillToAddress2: null, BillToAddress3: null, BillToAddress4: null, BillToCity: "Madison" , BillToState: "WI", BillToZip: "53716", BillToCountry: "USA", BillToPhone: "6085556666"};
-            $scope.billing = {billingID: "123", name: "David Moore", cardType: "Visa", BillToAddress1: "123 RoadName Rd", BillToAddress2: null, BillToAddress3: null, BillToAddress4: null, BillToCity: "Madison" , BillToState: "WI", BillToZip: "53716", BillToCountry: "USA"};
 
             // Set default max number of entries to show per page
             $scope.entryLimit = 10;
@@ -337,7 +335,7 @@ angular.module('ProtoApp')
         $scope.checkIn = function(){
             $scope.checkindata = { BillToID: $scope.resDetails.BillToID, GuestID: $scope.resDetails.GuestID, ReservationID: $scope.resDetails.ReservationID, EventID: $scope.resDetails.EventID, RoomID: $scope.RoomID, RoomType: $scope.resDetails.RoomType, AnicipatedCheckout: $scope.resDetails.EndDate, Rate: null, Deposit: null }
             console.log($scope.checkindata);
-                $http.post('../ajax/stayinsert.php', { BillToID: $scope.resDetails.BillToID, GuestID: null, ReservationID: $scope.resDetails.ReservationID, EventID: null, RoomID: $scope.RoomID, RoomType: null, AnicipatedCheckout: null, Rate: null, Deposit: null }).success(function(res) {
+                $http.post('../ajax/stayinsert.php', { BillToID: $scope.resDetails.BillToID, GuestID: $scope.resDetails.GuestID, ReservationID: $scope.resDetails.ReservationID, EventID: $scope.resDetails.EventID, RoomID: $scope.RoomID, RoomType: $scope.resDetails.RoomType, AnicipatedCheckout: $scope.resDetails.EndDate, Rate: null, Deposit: null }).success(function(res) {
                     console.log(res);
                     // $http.post('../ajax/guestDetails.php', { BillToID: $scope.resDetails.BillToID, GuestID: $scope.resDetails.GuestID, ReservationID: $scope.resDetails.ReservationID, EventID: $scope.resDetails.EventID, RoomID: $scope.RoomID, RoomType: $scope.resDetails.RoomType, AnicipatedCheckout: $scope.resDetails.EndDate, Rate: null, Deposit: null }).success(function(res) {
                     //     console.log(res);
