@@ -1010,8 +1010,8 @@ r.ReservationID
 ,c.FirstName as BillToFirstName
 ,c.LastName  as BillToLastName
 , r.GuestID
-, c2.FirstName as GuestFirstName
-, c2.LastName as GuestLastName
+, IFNULL(c2.FirstName, c.FirstName) as GuestFirstName
+, IFNULL(c2.LastName, C.LastName) as GuestLastName
 , r.EventID
 , e.EventName
 , e.HostID

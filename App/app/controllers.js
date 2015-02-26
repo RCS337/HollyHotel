@@ -306,7 +306,7 @@ angular.module('ProtoApp')
             console.log($scope.roomID);
         }
         $scope.getTodaysReservations = function(){
-            var startRange = $scope.today + " 11:00:00";
+            var startRange = $scope.today;// + " 11:00:00";
             var endRange = $scope.today + " 16:00:00";
             $http.post('../ajax/getReservations.php', { StartRange: startRange, EndRange: endRange }).success(function(res) {
                 console.log(res);
