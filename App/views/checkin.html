@@ -16,8 +16,8 @@
             </thead>
             <tbody>
                 <tr ng-repeat="data in filtered = (reservations | filter:search | orderBy : predicate :reverse) | startFrom:(currentPage-1)*searchLimit | limitTo:searchLimit">
-                    <td ng-click="go('/checkin/reservation/' + data.ReservationID)">{{data.BillToFirstName}} {{data.BillToLastName}}</a></td>
-                    <td ng-click="go('/checkin/reservation/' + data.ReservationID)">{{data.GuestFirstName}} {{data.GuestLastName}}</td>
+                    <td ng-click="go('/checkin/reservation/' + data.ReservationID)">{{data.GuestFirstName}} {{data.GuestLastName}}</a></td>
+                    <td ng-click="go('/checkin/reservation/' + data.ReservationID)">{{data.EventName}}</td>
                     <td ng-click="go('/checkin/reservation/' + data.ReservationID)">{{data.StartDate}}</td>
                     <td ng-click="go('/checkin/reservation/' + data.ReservationID)">{{data.EndDate}}</td>
                 </tr>
@@ -60,9 +60,9 @@
             </thead>
             <tbody>
                 <tr ng-repeat="data in filtered = (searchResults | filter:search | orderBy : predicate :reverse) | startFrom:(currentPage-1)*searchLimit | limitTo:searchLimit">
-                    <td ng-click="go('/guests/' + data.CustomerID)">{{data.CustomerID}}</a></td>
-                    <td ng-click="go('/guests/' + data.CustomerID)">{{data.FirstName}}</td>
-                    <td ng-click="go('/guests/' + data.CustomerID)">{{data.LastName}}</td>
+                    <td ng-click="go('/checkin/guest/' + data.CustomerID)">{{data.CustomerID}}</a></td>
+                    <td ng-click="go('/checkin/guest/' + data.CustomerID)">{{data.FirstName}}</td>
+                    <td ng-click="go('/checkin/guest/' + data.CustomerID)">{{data.LastName}}</td>
                 </tr>
             </tbody>
         </table>
@@ -76,5 +76,5 @@
 
 
 <div class="col-xs-12 form-group clear-group">
-    <a class="pull-left btn btn-primary" href="guests/new">New Guest</a>
+    <a class="pull-left btn btn-large btn-block btn-primary" href="guests/new">Add New Guest</a>
 </div>

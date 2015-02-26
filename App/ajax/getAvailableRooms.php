@@ -6,6 +6,7 @@
         // get data
         $data = file_get_contents("php://input");
         $input = json_decode($data);
+        // print_r($input);
         // prepare query
         $query = $db->prepare("CALL getavailableroomssp(:pstartdate, :penddate, :proomtype, :psmoking, :prequirements)");
         $query->bindValue(':pstartdate', $input->pstartdate, PDO::PARAM_STR);
@@ -17,8 +18,7 @@
         // execute query
         $query->execute();
         $response = array();
-        $i = 0;
-        foreach ($query->fetchAll(PDO::FETCH_ASSOC) as $row) {;
+        foreach ($query->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $response[] = $row;
         }
         // JSON-encode the response so Javascript can read it

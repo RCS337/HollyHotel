@@ -55,7 +55,7 @@ angular.module('ProtoApp', ['ngRoute', 'ui.bootstrap', 'ui.date'])
             })
             .when('/checkin/guest/:guestID', {
                 controller: 'CheckInController',
-                templateUrl: 'views/checkinGuest.html'
+                templateUrl: 'views/checkInGuest.html'
             })
             .when('/checkout', {
                 controller: 'MainController',

@@ -257,7 +257,8 @@ angular.module('ProtoApp')
             } else if ($routeParams.reservationID){
                 // do something else
                 // $scope.getReservationDetails();
-                console.log("res id is set");
+                var reservationID = $routeParams.reservationID;
+                $scope.getReservationDetails(reservationID);
             } else {
                 // do generic thing
                 $scope.getTodaysReservations();
@@ -267,6 +268,42 @@ angular.module('ProtoApp')
         $scope.go = function(path){
             console.log(path);
             $location.path( path );
+        }
+
+        $scope.getReservationDetails = function(resID){
+            var ReservationID = resID;
+            $http.post('../ajax/reservationDetails.php', { ReservationID: ReservationID }).success(function(res) {
+                $scope.resDetails = res;
+                $scope.getReservationRooms();
+            })
+        }
+        $scope.getReservationRooms = function(){
+            $scope.pstartdate = $scope.resDetails.StartDate.toString();
+            $scope.penddate = $scope.resDetails.EndDate.toString();
+            $scope.smoking = $scope.resDetails.Smoking;
+            // $scope.proomtype = $scope.resDetails.RoomType;
+            // var prequirements = "";
+
+                // $scope.pstartdate = "2015-02-01 00:00:00";
+                // $scope.penddate = "2015-02-21 00:00:00";
+                // $scope.smoke = "0";
+                $scope.proomtype = 15;
+                $scope.prequirements = "";
+
+            $http.post('../ajax/getAvailableRooms.php', { psmoking: $scope.smoking, pstartdate: $scope.pstartdate, penddate: $scope.penddate, proomtype: $scope.proomtype, prequirements: $scope.prequirements }).success(function(res) {
+
+                $scope.availRooms = res;
+                console.log(res);
+                $scope.filteredItems = $scope.availRooms.length;
+                $scope.searchLimit = 10;
+                $scope.entryLimit = 5;
+                $scope.maxSize = 10;
+                $scope.currentPage = 1;
+            });
+        }
+        $scope.selectRoom = function(roomID){
+            $scope.roomID = roomID;
+            console.log($scope.roomID);
         }
         $scope.getTodaysReservations = function(){
             var startRange = $scope.today + " 11:00:00";

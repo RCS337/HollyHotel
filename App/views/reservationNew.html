@@ -19,25 +19,29 @@
             </div>
         </form>
         <!-- Display Search Results -->
-        <table class="table table-striped table-bordered table-hover table-responsive clear-group dataTable" ng-show="searchItems > 0">
-            <thead>
-                <tr>
-                    <th ng-click='sort("CustomerID")' class="pointer">ID &nbsp;<i class="fa fa-arrows-v"></i></th>
-                    <th ng-click='sort("FirstName")' class="pointer">First Name &nbsp;<i class="fa fa-arrows-v"></i></th>
-                    <th ng-click='sort("LastName")' class="pointer">Last Name &nbsp;<i class="fa fa-arrows-v"></i></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="data in filtered = (searchResults | filter:search | orderBy : predicate :reverse) | startFrom:(currentPage-1)*searchLimit | limitTo:searchLimit">
-                    <td ng-click="useGuest(data.CustomerID)">{{data.CustomerID}}</a></td>
-                    <td ng-click="useGuest(data.CustomerID)">{{data.FirstName}}</td>
-                    <td ng-click="useGuest(data.CustomerID)">{{data.LastName}}</td>
-                </tr>
-            </tbody>
-        </table>
-        <!-- Pagination -->
-        <div ng-show="searchItems > searchLimit">
-            <pagination ng-model="currentPage" max-size="maxSize" total-items="searchItems" items-per-page="searchLimit" boundary-links="false" rotate="false"></pagination>
+        <div class="table-responsive" ng-show="availRooms != null">
+            <table class="table table-striped table-bordered table-hover table-responsive clearfix">
+                <thead>
+                    <tr>
+                        <th ng-click='sort("RoomNumber")' class="pointer">Room Number &nbsp;<i class="fa fa-arrows-v"></i></th>
+                        <th ng-click='sort("Beds")' class="pointer">Beds &nbsp;<i class="fa fa-arrows-v"></i></th>
+                        <th ng-click='sort("Features")' class="pointer">Features &nbsp;<i class="fa fa-arrows-v"></i></th>
+                        <th ng-click='sort("SmokingAllowed")' class="pointer">Smoking &nbsp;<i class="fa fa-arrows-v"></i></th>
+                        <th ng-click='sort("BuildingName")' class="pointer">Building &nbsp;<i class="fa fa-arrows-v"></i></th>
+                        <th ng-click='sort("WingName")' class="pointer">Wing &nbsp;<i class="fa fa-arrows-v"></i></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="data in filtered = (availableRooms | filter:search | orderBy : predicate :reverse) | startFrom:(currentPage-1)*entryLimit | limitTo:entryLimit">
+                        <td ng-click="go('/guests/' + data.CustomerID)">{{data.RoomNumber}}</a></td>
+                        <td ng-click="go('/guests/' + data.CustomerID)">{{data.Beds}}</td>
+                        <td ng-click="go('/guests/' + data.CustomerID)">{{data.Features}}</td>
+                        <td ng-click="go('/guests/' + data.CustomerID)">{{data.SmokingAllowed}}</td>
+                        <td ng-click="go('/guests/' + data.CustomerID)">{{data.BuildingName}}</td>
+                        <td ng-click="go('/guests/' + data.CustomerID)">{{data.WingName}}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
