@@ -1266,8 +1266,8 @@ INSERT INTO RESERVATION (BillToId, GuestID, EventID, RoomType, StartDate, EndDat
 SELECT 
  c.CustomerID
 , case (t.StartDate+t.EndDate)%17
-	when 0 then FLOOR(c.CustomerID/2)+5
-    when 1 then FLOOR(c.CustomerID/2)-5
+	when 3 then FLOOR(c.CustomerID/2)+18
+    when 4 then FLOOR(c.CustomerID/2)
     else Null end as GuestID
 , Null as EventID
 , (SELECT TypeNameID from Type_Name Where UsageID='RoomType' and Name = 'Sleeping') as RoomType
@@ -1296,7 +1296,7 @@ insert into RES_FEATURES
     else (SELECT TypeNameID  from Type_Name where UsageID='bedtype' and name = 'Double Bed')
 
 end as BEDTYPE
-, 0 AS ProximityID
+, 1 AS ProximityID
 from reservation, tmp_numlist t where num<3
 );
 

@@ -1146,7 +1146,7 @@ join room r on r.roomid=s.RoomID
 join type_name ct on ct.TypeNameID=sc.ChargeType
 WHERE IFNULL(s.Checkout,NOW()) >= DATE_ADD(NOW(), INTERVAL -14 DAY) 
 #COMMENT 'USED TO SUMMARIZE CHARGES WITHOUT CREATING JOINS IN THE UI'
-;$$
+;$$ 
 
 /************************************************************************************/
 DROP VIEW IF EXISTS `OpenMaintTicketsVw` $$
